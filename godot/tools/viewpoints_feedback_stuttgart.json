@@ -1,0 +1,70 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 12:00:00 UTC. Views of feedback issues in the Stuttgart world (/hs:feedback), rendered before and after the fix.",
+  "views": [
+    {
+      "name": "issue-1-gebhard-mueller-platz-portal",
+      "position": [
+        -876.5,
+        8.5,
+        1004.4
+      ],
+      "look_at": [
+        -860.7,
+        4.9,
+        1016.2
+      ]
+    },
+    {
+      "name": "issue-3-haus-auf-b14",
+      "position": [
+        2812.1,
+        -9.1,
+        83.2
+      ],
+      "look_at": [
+        2793.4,
+        -12.3,
+        89.3
+      ]
+    },
+    {
+      "name": "issue-3-b14-ueberblick",
+      "position": [
+        2790.0,
+        20.0,
+        40.0
+      ],
+      "look_at": [
+        2800.0,
+        -12.0,
+        90.0
+      ]
+    },
+    {
+      "name": "issue-1-portal-oben",
+      "position": [
+        -900.0,
+        35.0,
+        1055.0
+      ],
+      "look_at": [
+        -860.0,
+        6.0,
+        1017.0
+      ]
+    },
+    {
+      "name": "issue-1-portal-zufahrt",
+      "position": [
+        -935.0,
+        9.0,
+        985.0
+      ],
+      "look_at": [
+        -860.0,
+        6.0,
+        1017.0
+      ]
+    }
+  ]
+}

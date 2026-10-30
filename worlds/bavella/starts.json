@@ -1,0 +1,56 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 11:00:00 UTC. Start points for the drive menu: lat/lon is the nearest point of a road from the built extract and is snapped to the nearest drivable edge of that road; a start faces along the route, from Solenzara up to the Col de Bavella (pipeline/starts.py). The first entry is the route start (the D 268 from the coast to the pass).",
+  "starts": [
+    {
+      "name": "Solenzara – Col de Bavella",
+      "route_start": true
+    },
+    {
+      "name": "Col de Bavella",
+      "road": "Strada di Bavedda",
+      "at": [
+        41.79543,
+        9.22746
+      ]
+    },
+    {
+      "name": "Cascades de Polischellu (D 268)",
+      "at": [
+        41.83418,
+        9.28274
+      ]
+    },
+    {
+      "name": "Strada di Bavella, bergauf",
+      "road": "Strada di Bavella",
+      "at": [
+        41.8393,
+        9.33092
+      ]
+    },
+    {
+      "name": "Solenzara (T 10)",
+      "road": "Via di U Commandanti Poli",
+      "at": [
+        41.85793,
+        9.399
+      ]
+    },
+    {
+      "name": "Sari-Solenzara",
+      "road": "Strada di Sari",
+      "at": [
+        41.85002,
+        9.38574
+      ]
+    },
+    {
+      "name": "Favone (T 10)",
+      "road": "Strada d'a Marina",
+      "at": [
+        41.77281,
+        9.39678
+      ]
+    }
+  ]
+}

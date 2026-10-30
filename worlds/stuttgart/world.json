@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "stuttgart",
+  "name": "Stuttgart",
+  "version": "1",
+  "min_game": "0.1.0",
+  "center": [48.790, 9.200],
+  "size_km": 10,
+  "horizon_km": 40,
+  "bbox": [9.125, 48.740, 9.275, 48.840],
+  "osm_region": "europe/germany/baden-wuerttemberg/stuttgart-regbez",
+  "route": "route.json",
+  "starts": "starts.json",
+  "sources": [
+    {"name": "OpenStreetMap", "licence": "ODbL", "url": "https://www.openstreetmap.org/copyright", "credit": "© OpenStreetMap contributors"},
+    {"name": "DGM1 Baden-Württemberg", "licence": "dl-de/by-2-0", "url": "https://www.lgl-bw.de", "credit": "Datenquelle: LGL, www.lgl-bw.de, dl-de/by-2-0 (verändert)"},
+    {"name": "Copernicus DEM", "licence": "COPERNICUS", "url": "https://spacedata.copernicus.eu", "credit": "produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."}
+  ],
+  "attribution": "Data: © OpenStreetMap contributors (ODbL, openstreetmap.org/copyright); terrain: Datenquelle: LGL, www.lgl-bw.de, dl-de/by-2-0 (verändert); horizon: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+}

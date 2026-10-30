@@ -1,0 +1,70 @@
+---
+name: heimstrecke-worlds
+description: Use when creating, changing or debugging a Heimstrecke world or the world pipeline (pipeline/*.py, worlds/<id>/): recipe, data sources (OSM, DGM1, LiDAR HD, Copernicus, OSRM), sea, biome, turned worlds, road heights, terrain conform, clipping and z-fighting, tunnels, bridges, sidewalks, start points, gates, packaging, licences. Not for cars or audio.
+---
+<!-- file generated with AI assistance: Claude Code - 2026-10-23 14:50:00 UTC -->
+
+# Heimstrecke worlds
+
+Full text: `docs/world-creation.md` (how a world is made, constants, known limits), `docs/licences.md` (data and software licences), `docs/reference.md` (make targets, launcher arguments). Read the section you need before changing pipeline code; the sections below are the rules that cost the most time to learn. The code is the truth: constants named here can be found with `grep`.
+
+## New world
+
+1. Recipe `worlds/<id>/world.json` (copy `sources`, `attribution`, `osm_region` from a neighbour, `bbox` = centre ± 0.075° lon / ± 0.05° lat for 10 km, `horizon_km` 40). Check `uv run python pipeline/world.py vars worlds/<id>/world.json` before downloading.
+2. `nice -n 19 make world W=<id>` (host rules below). Four hard gates must PASS.
+3. `starts.json` from edge midpoints of the extract, with `road`; no `toward` means an arbitrary direction. Never use a map coordinate for `at` (it snaps tens of metres away); never name a road whose extract edge has no name.
+4. Drive it. Then baselines from an *unchanged* build: `clipping_baseline.json` (else the ratchet says SKIPPED), `godot/tests/reference_<id>.json`.
+5. `make pack W=<id>` (limit 500 MB). Only add `route.json` when asked; a world without route is valid.
+6. Outside Baden-Württemberg (France): `"terrain": "lidarhd"`; Corsica also `"biome": "mediterranean"`. Elsewhere `"terrain": "gedtm30"` and, outside UTM zone 32, `"epsg"` (Cyprus 32636); Cyprus has `"biome": "mediterranean-dry"`. A road that runs diagonally gets a turned strip (`width_km`, `heading_deg`): fit the heading through the road's nodes in the extract, do not guess it from a map.
+
+## Data
+
+- DGM1 (LGL BW) has **no bridges and no buildings**: steep ramps at bridge or tunnel ends are artefacts of the end node taking a DGM1 median on the embankment. Look at structure ends before believing a grade.
+- LiDAR HD (IGN WMS): values below -5 m are no data (the service resamples -9999 into the coast); a turned raster needs `TURNED_PAD_M` beyond the margin, else `Dgm1Raster` refuses it or the clipping report reads past it. Blocks are cached, the warp still takes minutes.
+- Sea comes from the OSM coastline (land left, sea right); NaN inland stays NaN on purpose, never fill it silently.
+- Copernicus is a surface model, 2.5 to 6 m too high: horizon only. Pick its 1° tiles from the **horizon** square.
+- Outside Germany and France: `"terrain": "gedtm30"` (since 2026-10-27), a window of the global GEDTM30 COG, no key. Its file says `scale 0.1`, the values are metres; sea is no data. 30 m is a substitute raster: measure the gates, do not loosen them (Ayia Napa passes all four). The UTM zone comes from the recipe's `epsg` (default 25832, a raster in another zone gets `_<epsg>` in its name). Look for an open 1 m model of the country first; alternatives and licences in `docs/world-creation.md`, "Terrain sources outside Germany and France".
+- Signs know `de`, `fr` and `cy` (`country_of()` from the Geofabrik path); any other country gets the German style. Cyprus: signs on the left (`LEFT_HAND`), Greek over Latin from the places' name variants (`extract.PLACE_NAMES`), motorway green, B roads and signposts blue.
+- `fetch.py` deletes the zips after building the GeoTIFF: keep the GeoTIFF, copy it from another machine if `opengeodata.lgl-bw.de` is down. DGM1 stops at the state border (nodata cells, Crailsheim 0.3 %).
+- An old `extract.pkl` (changed `ROAD_TAGS`) makes `build.py` exit 2; `make world` re-extracts. Every recipe edit re-extracts.
+- Tracks: recipe `"tracks": ["grade1", "grade2"]` makes `highway=track` gravel roads (3 m, rank 0, access ignored, `TRACK_CLEAR` through forest), plus plain `service` ways linking a track to a road. Without the key no track and no service way is extracted; keep it that way so the other worlds stay byte-identical. Gravel has no own grip yet.
+- OSM: `layer` tags are unreliable, use plan-view geometry; street names do not identify junctions or tunnels; `service` roads are not in the network; access-restricted roads are excluded.
+- The OSRM demo server is flaky and has a usage policy: fetch once, commit the response.
+- Licences travel in the manifest (`sources`, `attribution`); never drop them from a recipe. The ODbL share-alike question for shared packages is open, see `docs/licences.md`.
+
+## Geometry rules
+
+- **New geometry goes into a new tile layer**, never into `roads`: `metrics.shared_heights()` indexes every `roads` vertex by (x, z), any other surface at the same position breaks the gate.
+- Godot materials are one-sided: emit structure surfaces with both windings, ceilings and tubes on separate vertices.
+- Read widths from `net.half[s]` (per sample), not per-edge width; conform with the old width fails `terrain_below_roads` after the taper.
+- Terrain is a 10 m grid and `push_down` lowers every triangle corner under a road: terrain above the road is not possible with the 2 cm gate; the edge falls off with the 20° skirt only, no bank rises above it (removed 2026-10-25, it read as a raised kerb).
+- Conform has a keep rule: grid points nearer to a tunnel or deck segment than to a conformed road keep DGM1. Without it every portal gets a 15 to 40 m trench and every bridge start an embankment.
+- Tunnels: cut the terrain only where it meets the cross-section (no lid, no masks); classes covered / slot / open by `COVER_MIN`; drop wall pieces that stand on another carriageway.
+- Bridges: find crossings by geometry; raise decks to `CLEAR_MIN` + `DECK_DEPTH`; `low` (creek) bridges are plain roads; transverse end walls and parapet ends must not stand on a carriageway (the smoke drive caught this).
+- Buildings under a deck or a raised road end 1 m below it (`RoadsOver` in `build.py`); only roads more than 2 m above the building's floor count, so footprints touching a street at their own level stay as they are; a footprint at least half under such roads is capped as a whole (`UNDER_SHARE`).
+- Clipping: skirts, sidewalks and corners **yield** to carriageways (`priority.py`); a sidewalk corner must ignore its own arms and its own node hull. Equal-class strips overlapping (z-fight) are an open problem, not a regression.
+
+## Gates, determinism, tests
+
+- Hard gates (exit 3): `shared_heights`, `terrain_below_roads`, `max_grade` (25 %), `node_heights` (2 m). The clipping report is a ratchet against the committed baseline with 2 % slack.
+- Recipe switches (`terrain`, `biome`, `width_km`, `heading_deg`) must leave the default path untouched: the square temperate worlds stay byte-identical, Stuttgart and Bavella are the references. `half` is a scalar or `[hx, hy]`, unpack it with `np.broadcast_to(half, 2)`.
+- Before a change: build the unchanged `main` into a baseline directory. A refactor must keep `sha256sum tile_*.glb horizon.glb` identical; commit it separately before the behaviour change. Two builds of the same code are byte-identical; if not, something is non-deterministic.
+- Do not judge geometry on a substitute raster (Copernicus as DGM1): grade, braking and tunnel checks fail for no good reason.
+- Smoke test: steered drives (`smoke.json`), because a straight drive does not reach a portal. Do not rewrite `reference_<id>.json` unless `car.gd` changed.
+- A route start or start point must lie on a drivable road with free space around it.
+- Do not change the car (`car.gd`) in world work.
+- Screenshots (software render, no shadows) illustrate, the metrics are the gate. Software renders show fewer minor roads than a GPU.
+
+## Host (workhorse, 4 vCPU, 7.6 GiB, shared)
+
+`cat /proc/loadavg` below 4 and `free -h` above 1 GiB before downloads, builds, renders; `nice -n 19`; one heavy job at a time; no database containers. Docker cannot see `/tmp`, render from a path under the home directory. A worktree has no `data/`: symlink `data/raw` from the main checkout. Areas much larger than 10 km are built on a developer machine.
+
+## Process
+
+Feature branch in its own worktree off `origin/main`, Conventional Commits with `[*]`, no amend, no force push, additive merge of `origin/main` on conflicts. Report deviations over 10 % from expected numbers instead of accepting them. Update `docs/world-creation.md` when a rule here changes.
+<!-- - revised 2026-10-23 (LiDAR HD, sea, biome, turned worlds) -->
+<!-- - revised 2026-10-25 (buildings under roads) -->
+<!-- - revised 2026-10-25 (terrain sources outside Germany and France) -->
+<!-- - revised 2026-10-25 (tracks) -->
+<!-- - revised 2026-10-27 (GEDTM30, epsg, mediterranean-dry, signs outside DE/FR) -->
+<!-- - revised 2026-10-27 (signs in Cyprus) -->

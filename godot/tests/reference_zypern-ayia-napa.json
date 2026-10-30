@@ -1,0 +1,8 @@
+{
+  "hostname": "system-26",
+  "measured_at": "2026-10-27T11:31:52Z",
+  "physics_ticks_per_second": 120,
+  "accel_0_50_s": 2.258,
+  "brake_30_0_s": 0.742,
+  "load_ms": 2405
+}

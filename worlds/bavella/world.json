@@ -1,0 +1,46 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 10:30:00 UTC. Col de Bavella down the D268 to Solenzara and the coast; terrain from the IGN LiDAR HD, the sea from the OSM coastline; the route is the D 268 from Solenzara on the coast up to the Col de Bavella (route.json, one OSRM response of 2026-10-27, waypoints in route_waypoints.json).",
+  "schema": 1,
+  "id": "bavella",
+  "name": "Bavella: Solenzara – Col de Bavella",
+  "version": "1",
+  "min_game": "0.1.0",
+  "center": [
+    41.815,
+    9.313
+  ],
+  "size_km": 16,
+  "horizon_km": 40,
+  "bbox": [
+    9.21,
+    41.738,
+    9.416,
+    41.892
+  ],
+  "osm_region": "europe/france/corse",
+  "terrain": "lidarhd",
+  "biome": "mediterranean",
+  "route": "route.json",
+  "starts": "starts.json",
+  "sources": [
+    {
+      "name": "OpenStreetMap",
+      "licence": "ODbL",
+      "url": "https://www.openstreetmap.org/copyright",
+      "credit": "© OpenStreetMap contributors"
+    },
+    {
+      "name": "IGN LiDAR HD",
+      "licence": "Licence Ouverte 2.0 (Etalab)",
+      "url": "https://geoservices.ign.fr/lidarhd",
+      "credit": "© IGN – LiDAR HD (retrieved 2026-10), Licence Ouverte 2.0, modified"
+    },
+    {
+      "name": "Copernicus DEM",
+      "licence": "COPERNICUS",
+      "url": "https://spacedata.copernicus.eu",
+      "credit": "produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+    }
+  ],
+  "attribution": "Data: © OpenStreetMap contributors (ODbL, openstreetmap.org/copyright); terrain: © IGN – LiDAR HD (retrieved 2026-10), Licence Ouverte 2.0, modified; horizon: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+}

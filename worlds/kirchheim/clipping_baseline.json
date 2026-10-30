@@ -1,0 +1,17 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 16:00:00 UTC. Clipping ratchet of the world kirchheim for pipeline/clipping.py, read by metrics.clipping_baseline from the directory of the recipe. Measured on the unchanged origin/main 5b3f74d with `make world W=kirchheim` (no pipeline change in this branch), the counts of metrics.json block clipping. A kind may exceed its count by clipping.RATCHET_SLACK (rounded up), the total of the measured kinds may not exceed theirs.",
+  "center": [48.64, 9.44],
+  "size_km": 10,
+  "date": "2026-10-26",
+  "commit": "5b3f74d",
+  "counts": {
+    "zfight": {"count": 11, "measured": true},
+    "overlap": {"count": 25, "measured": true},
+    "median": {"count": 418, "measured": true},
+    "width_step": {"count": 0, "measured": true},
+    "terrain_above": {"count": 0, "measured": true},
+    "bank_buried": {"count": null, "measured": false},
+    "skirt_cross": {"count": 140, "measured": true},
+    "dip": {"count": 20, "measured": true}
+  }
+}

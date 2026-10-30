@@ -1,0 +1,61 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 16:40:00 UTC. Kirchheim: the route start, three junctions and turns on the route seen from 7 m above the route about 30 m before them (route chevrons, boards across the roads leaving it), and a main road in Kirchheim 715 m off the route (unaffected).",
+ "views": [
+  {
+   "name": "route-start",
+   "waypoint": 0
+  },
+  {
+   "name": "junction-town",
+   "position": [
+    687.6,
+    4.2,
+    -724.8
+   ],
+   "look_at": [
+    663.4,
+    -2.0,
+    -763.7
+   ]
+  },
+  {
+   "name": "junction-south",
+   "position": [
+    -212.9,
+    -8.9,
+    -1418.6
+   ],
+   "look_at": [
+    -251.7,
+    -16.5,
+    -1440.0
+   ]
+  },
+  {
+   "name": "turn-west",
+   "position": [
+    -1825.4,
+    9.2,
+    -925.5
+   ],
+   "look_at": [
+    -1828.4,
+    4.2,
+    -896.2
+   ]
+  },
+  {
+   "name": "off-route",
+   "position": [
+    -131.2,
+    58.2,
+    358.6
+   ],
+   "look_at": [
+    -131.2,
+    18.2,
+    298.6
+   ]
+  }
+ ]
+}

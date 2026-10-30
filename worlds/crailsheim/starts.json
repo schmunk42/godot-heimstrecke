@@ -1,0 +1,61 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 01:00:00 UTC. Start points for the drive menu: lat/lon is the midpoint of a named road edge from the built extract and is snapped to the nearest drivable edge of that road; without toward the driving direction is the edge direction.",
+  "starts": [
+    {
+      "name": "Innenstadt",
+      "road": "Karlstraße",
+      "at": [
+        49.13737,
+        10.07217
+      ]
+    },
+    {
+      "name": "Bahnhof",
+      "road": "Bahnhofstraße",
+      "at": [
+        49.14004,
+        10.06856
+      ]
+    },
+    {
+      "name": "Jagstbrücke",
+      "road": "Jagstbrücke",
+      "at": [
+        49.13972,
+        10.06937
+      ]
+    },
+    {
+      "name": "Ellwanger Straße (B 290)",
+      "road": "Ellwanger Straße",
+      "at": [
+        49.13366,
+        10.07328
+      ]
+    },
+    {
+      "name": "Nord-West-Umgehung",
+      "road": "Nord-West-Umgehung",
+      "at": [
+        49.15121,
+        10.06725
+      ]
+    },
+    {
+      "name": "Dr.-Bareilles-Straße",
+      "road": "Dr.-Bareilles-Straße",
+      "at": [
+        49.12622,
+        10.08149
+      ]
+    },
+    {
+      "name": "Willy-Brandt-Straße",
+      "road": "Willy-Brandt-Straße",
+      "at": [
+        49.13616,
+        10.03537
+      ]
+    }
+  ]
+}

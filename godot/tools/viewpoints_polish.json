@@ -1,0 +1,281 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 00:30:00 UTC; low and oblique views written by pipeline/scout.py from scenes.json",
+ "views": [
+  {
+   "name": "bank-sidewalk",
+   "position": [
+    3838.7,
+    -11.2,
+    2790.5
+   ],
+   "look_at": [
+    3845.2,
+    -14.2,
+    2804.0
+   ],
+   "hint": "Bank beside the sidewalk: a light stone edge, no dark seam."
+  },
+  {
+   "name": "bank-hill",
+   "position": [
+    -1870.4,
+    15.3,
+    2263.6
+   ],
+   "look_at": [
+    -1857.1,
+    11.3,
+    2251.5
+   ],
+   "hint": "Bank on the uphill side, the skirt steepening into the wall as before."
+  },
+  {
+   "name": "bank-median",
+   "position": [
+    -888.7,
+    7.6,
+    768.5
+   ],
+   "look_at": [
+    -880.5,
+    1.0,
+    750.3
+   ],
+   "hint": "Two carriageways with a narrow median: the banks meet at a low ridge, no crossing skirts, no double-width bank."
+  },
+  {
+   "name": "s01-urbanstrasse",
+   "position": [
+    -947.3,
+    18.0,
+    1227.2
+   ],
+   "look_at": [
+    -953.4,
+    14.6,
+    1240.9
+   ],
+   "hint": "Straight street with sidewalks on both sides."
+  },
+  {
+   "name": "s02-hauptstaetter",
+   "position": [
+    -1939.2,
+    23.1,
+    2330.6
+   ],
+   "look_at": [
+    -1911.4,
+    9.1,
+    2301.9
+   ],
+   "hint": "Slope with a retaining wall."
+  },
+  {
+   "name": "s03-willy-brandt-median",
+   "position": [
+    -892.8,
+    17.2,
+    777.6
+   ],
+   "look_at": [
+    -880.5,
+    1.0,
+    750.3
+   ],
+   "hint": "Median between the two carriageways from above."
+  },
+  {
+   "name": "s04-junction-corners",
+   "position": [
+    -1046.6,
+    27.7,
+    1701.1
+   ],
+   "look_at": [
+    -1059.4,
+    15.6,
+    1722.5
+   ],
+   "hint": "Ordinary junction with sidewalk corners."
+  },
+  {
+   "name": "s05-innenstadt-portal",
+   "position": [
+    -1020.0,
+    6.8,
+    1035.8
+   ],
+   "look_at": [
+    -1005.1,
+    -1.0,
+    998.7
+   ],
+   "hint": "Portal of the B 14 Innenstadt tunnel (the tunnel edges carry no name; the portal nearest to the curated innenstadt-portal view)."
+  },
+  {
+   "name": "s06-paulinenbruecke-taper",
+   "position": [
+    -2115.2,
+    33.5,
+    1975.5
+   ],
+   "look_at": [
+    -2139.6,
+    23.5,
+    1950.4
+   ],
+   "hint": "Lane count changes at a degree-2 node: the width blends over 30 m, no notch."
+  },
+  {
+   "name": "s07-in-tunnel",
+   "position": [
+    -2474.8,
+    51.0,
+    3538.4
+   ],
+   "look_at": [
+    -2468.2,
+    48.7,
+    3530.9
+   ],
+   "hint": "Inside the Heslacher Tunnel (B 14): road, walls and ceiling; the Innenstadt tunnel is an open slot at its middle."
+  },
+  {
+   "name": "s08-heilandsplatz",
+   "position": [
+    302.2,
+    25.7,
+    -34.4
+   ],
+   "look_at": [
+    281.5,
+    5.7,
+    -56.1
+   ],
+   "hint": "Roundabout Heilandsplatz."
+  },
+  {
+   "name": "s09-reichelenbergweg",
+   "position": [
+    -937.5,
+    61.6,
+    2241.2
+   ],
+   "look_at": [
+    -925.9,
+    57.6,
+    2257.5
+   ],
+   "hint": "Steep residential street, about 17 % grade."
+  },
+  {
+   "name": "s10-main-junction",
+   "position": [
+    -1569.1,
+    34.2,
+    1926.3
+   ],
+   "look_at": [
+    -1596.1,
+    9.2,
+    1962.4
+   ],
+   "hint": "Large junction of primaries: junction surface, no markings on it."
+  },
+  {
+   "name": "s11-neckartor",
+   "position": [
+    -727.7,
+    4.1,
+    262.8
+   ],
+   "look_at": [
+    -744.7,
+    -1.9,
+    281.1
+   ],
+   "hint": "Curve on a primary with edge lines."
+  },
+  {
+   "name": "s12-neue-strasse",
+   "position": [
+    489.0,
+    91.3,
+    2057.4
+   ],
+   "look_at": [
+    503.0,
+    88.3,
+    2062.7
+   ],
+   "hint": "Street with a sidewalk on one side."
+  },
+  {
+   "name": "s13-overview-city",
+   "waypoint": 1,
+   "offset": [
+    0,
+    80,
+    80
+   ],
+   "hint": "Schlossplatz area from 80 m at 45 degrees: facade colours and road network."
+  },
+  {
+   "name": "s14-overview-hill",
+   "position": [
+    -1552.6,
+    143.6,
+    2844.0
+   ],
+   "look_at": [
+    -1466.5,
+    83.6,
+    2760.4
+   ],
+   "hint": "Neue Weinsteige from above: hairpins, banks and skirts on the slope."
+  },
+  {
+   "name": "s15-portal-near",
+   "position": [
+    -1009.5,
+    2.5,
+    1009.8
+   ],
+   "look_at": [
+    -1005.1,
+    -1.0,
+    998.7
+   ],
+   "hint": "Tunnel portal close up: road, bank and portal wall."
+  },
+  {
+   "name": "route-bridge",
+   "position": [
+    841.6,
+    -10.5,
+    -1119.6
+   ],
+   "look_at": [
+    825.0,
+    -15.5,
+    -1108.3
+   ],
+   "hint": "The red route band lies on the bridge deck, not in it."
+  },
+  {
+   "name": "route-tunnel",
+   "position": [
+    89.4,
+    -0.8,
+    -1641.2
+   ],
+   "look_at": [
+    95.9,
+    -3.2,
+    -1633.6
+   ],
+   "hint": "The red route band lies above the tunnel floor, not in it."
+  }
+ ]
+}

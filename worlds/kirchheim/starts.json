@@ -1,0 +1,33 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 15:30:00 UTC. Start points for the drive menu: lat/lon is the midpoint of a named road edge from the built extract and is snapped to the nearest drivable edge of that road; without toward the driving direction is the edge direction.",
+  "starts": [
+    {
+      "name": "Ötlinger Rundkurs",
+      "route_start": true
+    },
+    {
+      "name": "Kirchheim Alleenstraße",
+      "road": "Alleenstraße",
+      "at": [
+        48.64839,
+        9.44926
+      ]
+    },
+    {
+      "name": "Ötlingen Stuttgarter Straße",
+      "road": "Stuttgarter Straße",
+      "at": [
+        48.65642,
+        9.42456
+      ]
+    },
+    {
+      "name": "Talwald Schießbahnsträßchen",
+      "road": "Schießbahnsträßchen",
+      "at": [
+        48.62278,
+        9.43012
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# file generated with AI assistance: Claude Code - 2026-10-26 00:40:00 UTC
+# Paths left out of the public snapshot (tools/public.sh, make public):
+# the internal GitLab tooling and internal docs.
+# One path per line, a directory takes everything below it.
+.gitlab-ci.yml
+.claude/commands/hs
+CLAUDE.md
+docs/gitlab.md
+docs/rename-heimstrecke.md
+godot/tools/viewpoints_feedback_berglen.json
+render/upload.sh
+render/snippets.sh
+tools/public-forbidden

@@ -1,0 +1,18 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-20 22:29:15 UTC",
+  "views": [
+    {"name": "stadium", "waypoint": 0},
+    {"name": "schlossplatz", "waypoint": 1},
+    {"name": "killesberg", "waypoint": 2},
+    {"name": "otto-hirsch", "position": [4178.6, 51.7, 3345.3],
+     "look_at": [4178.6, -8.3, 3255.3]},
+    {"name": "neckartor", "position": [-642.4, 55.9, 259.6],
+     "look_at": [-642.4, -4.1, 169.6]},
+    {"name": "innenstadt-portal", "position": [-1017.9, 4.0, 1040.3],
+     "look_at": [-988.1, 0.0, 966.0]},
+    {"name": "innenstadt-tunnel", "position": [-1009.9, 35.0, 1120.5],
+     "look_at": [-998.3, 0.0, 988.9]},
+    {"name": "koenig-karls-bruecke", "position": [802.6, 2.0, -1145.6],
+     "look_at": [813.0, -18.0, -1068.0]}
+  ]
+}

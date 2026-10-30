@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "world.schema.json",
+  "$comment": "file generated with AI assistance: Claude Code - 2026-10-22 22:41:00 UTC",
+  "title": "Heimstrecke world manifest",
+  "description": "world.json inside a .world package (pipeline/pack.py).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "id", "name", "version", "min_game", "built", "commit",
+    "center", "size_km", "tile_m", "base_height", "tiles", "horizon",
+    "terrain_source", "terrain_file", "horizon_source",
+    "sources", "attribution", "data_licence", "notice", "size_bytes",
+    "files"
+  ],
+  "$defs": {
+    "version": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+){0,2}$"}
+  },
+  "properties": {
+    "schema": {"description": "Manifest schema version.", "const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "name": {"type": "string", "minLength": 1},
+    "version": {"$ref": "#/$defs/version"},
+    "min_game": {
+      "description": "Lowest game version that can load the world.",
+      "$ref": "#/$defs/version"
+    },
+    "built": {
+      "description": "UTC build time of the package.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "commit": {
+      "description": "Short git commit of the pipeline, or unknown.",
+      "type": "string",
+      "minLength": 1
+    },
+    "center": {
+      "description": "Area centre, [lat, lon].",
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "size_km": {
+      "description": "Side of the playable area; the long side along heading_deg for a rectangular world.",
+      "type": "number", "exclusiveMinimum": 0},
+    "width_km": {
+      "description": "Side across heading_deg of a rectangular world (absent: size_km).",
+      "type": "number", "exclusiveMinimum": 0},
+    "heading_deg": {
+      "description": "Turn of the local frame, degrees counter-clockwise from east: local X points along it (absent: 0).",
+      "type": "number", "minimum": -90, "maximum": 90},
+    "tile_m": {"type": "number", "exclusiveMinimum": 0},
+    "base_height": {
+      "description": "DGM1 height at the centre, the local zero.",
+      "type": "number"
+    },
+    "tiles": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^tile_[0-9]{2}_[0-9]{2}\\.glb$"}
+    },
+    "horizon": {"type": "string", "minLength": 1},
+    "signs": {
+      "description": "JSON {signs: [{pos, face, kind, ref, lines}]} from pipeline/signs.py: direction signs, drawn by signs.gd.",
+      "type": "string", "minLength": 1},
+    "road_names": {
+      "description": "JSON list of one label per road edge (name and ref), indexed by the edge column of roads.bin; shown by the position readout (#).",
+      "type": "string", "minLength": 1},
+    "roads": {
+      "description": "Road centre lines (build.write_road_lines): float32 rows x, y, z (glTF frame, y the drawn surface), edge index and road rank; Godot puts the car back on the nearest road with F, lets the start map snap a click onto a road and draws the minimap from it.",
+      "type": "string", "minLength": 1},
+    "trees": {
+      "description": "Tree instances per tile (pipeline/trees.py): <name>.trees and <name>.trunks beside the tiles; counts per kind and chunk in file order.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kinds", "chunk_m", "tiles"],
+      "properties": {
+        "kinds": {"type": "array", "items": {"type": "string"}},
+        "chunk_m": {"type": "number", "exclusiveMinimum": 0},
+        "tiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "counts", "trunks"],
+            "properties": {
+              "name": {"type": "string", "pattern": "^tile_[0-9]{2}_[0-9]{2}$"},
+              "counts": {
+                "type": "array",
+                "items": {"type": "array", "items": {"type": "integer", "minimum": 0}}
+              },
+              "trunks": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "route": {
+      "description": "Route line as [x, y, z] points, or null.",
+      "type": ["array", "null"],
+      "items": {
+        "type": "array",
+        "items": {"type": "number"}
+      }
+    },
+    "waypoints": {
+      "description": "Route waypoints as [x, y, z] points.",
+      "type": "array",
+      "items": {"type": "array", "items": {"type": "number"}}
+    },
+    "starts": {"type": "array", "items": {"type": "object"}},
+    "terrain_source": {"type": "string"},
+    "terrain_file": {"type": "string"},
+    "horizon_source": {"type": "string"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "licence", "url", "credit"],
+        "properties": {
+          "name": {"type": "string"},
+          "licence": {"type": "string"},
+          "url": {"type": "string"},
+          "credit": {"type": "string"}
+        }
+      }
+    },
+    "attribution": {"type": "string", "minLength": 1},
+    "data_licence": {
+      "description": "Licence of the tiles and tree files (ODbL, see docs/licences.md).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url", "covers"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "minLength": 1},
+        "covers": {"type": "string", "minLength": 1}
+      }
+    },
+    "notice": {
+      "description": "Licence notice and offer of the pipeline (ODbL 4.3, 4.6), shown in the credits.",
+      "type": "string",
+      "minLength": 1
+    },
+    "size_bytes": {
+      "description": "Uncompressed size of all files except world.json.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "files": {
+      "description": "SHA-256 of every packaged file except world.json.",
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    }
+  }
+}

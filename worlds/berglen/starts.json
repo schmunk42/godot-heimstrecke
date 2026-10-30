@@ -1,0 +1,52 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 01:00:00 UTC. Start points for the drive menu: lat/lon is the midpoint of a named road edge from the built extract and is snapped to the nearest drivable edge of that road; without toward the driving direction is the edge direction.",
+  "starts": [
+    {
+      "name": "Oppelsbohm",
+      "road": "Beethovenstraße",
+      "at": [
+        48.86015,
+        9.46849
+      ]
+    },
+    {
+      "name": "Käbschütztaler Kreisel",
+      "at": [
+        48.84797,
+        9.45254
+      ]
+    },
+    {
+      "name": "Neuffenstraße",
+      "road": "Neuffenstraße",
+      "at": [
+        48.85162,
+        9.48708
+      ]
+    },
+    {
+      "name": "Winnender Straße",
+      "road": "Winnender Straße",
+      "at": [
+        48.85924,
+        9.49887
+      ]
+    },
+    {
+      "name": "Lange Straße",
+      "road": "Lange Straße",
+      "at": [
+        48.87131,
+        9.47046
+      ]
+    },
+    {
+      "name": "Rehstraße",
+      "road": "Rehstraße",
+      "at": [
+        48.82926,
+        9.46406
+      ]
+    }
+  ]
+}

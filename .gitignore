@@ -1,0 +1,9 @@
+# file generated with AI assistance: Claude Code - 2026-10-20 18:20:00 UTC
+.godot/
+_tasks/
+.claude/settings.local.json
+.venv/
+__pycache__/
+data/raw/
+data/out/
+build/

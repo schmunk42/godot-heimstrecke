@@ -1,0 +1,61 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-27 13:10:00 UTC. Start points for the drive menu: lat/lon is the midpoint of a named road edge from the built extract and is snapped to the nearest drivable edge of that road; without toward the driving direction is the edge direction (the motorway is one-way).",
+  "starts": [
+    {
+      "name": "Vila Téra – Ayia Napa",
+      "route_start": true
+    },
+    {
+      "name": "Nissi Avenue",
+      "road": "Leoforos Nissi",
+      "at": [
+        34.98971,
+        33.97551
+      ],
+      "toward": [
+        34.98797,
+        33.98957
+      ]
+    },
+    {
+      "name": "Agias Theklas",
+      "road": "Agias Theklas",
+      "at": [
+        34.98376,
+        33.94225
+      ],
+      "toward": [
+        34.98971,
+        33.97551
+      ]
+    },
+    {
+      "name": "Kavo Gkrekon",
+      "road": "Leforos Kavo Gkrekon",
+      "at": [
+        34.98831,
+        34.0092
+      ],
+      "toward": [
+        34.9852,
+        34.03
+      ]
+    },
+    {
+      "name": "Kriou Nerou",
+      "road": "Λεωφόρος Κριού Νερού",
+      "at": [
+        34.9852,
+        34.01486
+      ]
+    },
+    {
+      "name": "A3 Larnaka – Ayia Napa",
+      "road": "Αυτοκινητόδρομος Λάρνακας - Αγίας Νάπας",
+      "at": [
+        34.98708,
+        33.93654
+      ]
+    }
+  ]
+}

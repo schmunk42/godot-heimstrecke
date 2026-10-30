@@ -1,0 +1,48 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 13:40:00 UTC. A 41 x 7 km strip along the T 50 from Corte to Aleria, turned to the road's axis (heading_deg from a fit through the T 50 nodes of the OSM extract); terrain from the IGN LiDAR HD, mediterranean biome; the route is the T 50 stage from Aléria (T 10) to Corte (route_waypoints.json, tools/route_from_extract.py).",
+  "schema": 1,
+  "id": "korsika-aleria-corte",
+  "name": "Korsika: Aléria – Corte",
+  "version": "1",
+  "min_game": "0.1.0",
+  "center": [
+    42.20098,
+    9.33299
+  ],
+  "size_km": 41,
+  "width_km": 7,
+  "heading_deg": -34.3,
+  "horizon_km": 60,
+  "bbox": [
+    9.094,
+    42.063,
+    9.571,
+    42.339
+  ],
+  "osm_region": "europe/france/corse",
+  "terrain": "lidarhd",
+  "biome": "mediterranean",
+  "route": "route.json",
+  "starts": "starts.json",
+  "sources": [
+    {
+      "name": "OpenStreetMap",
+      "licence": "ODbL",
+      "url": "https://www.openstreetmap.org/copyright",
+      "credit": "© OpenStreetMap contributors"
+    },
+    {
+      "name": "IGN LiDAR HD",
+      "licence": "Licence Ouverte 2.0 (Etalab)",
+      "url": "https://geoservices.ign.fr/lidarhd",
+      "credit": "© IGN – LiDAR HD (retrieved 2026-10), Licence Ouverte 2.0, modified"
+    },
+    {
+      "name": "Copernicus DEM",
+      "licence": "COPERNICUS",
+      "url": "https://spacedata.copernicus.eu",
+      "credit": "produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+    }
+  ],
+  "attribution": "Data: © OpenStreetMap contributors (ODbL, openstreetmap.org/copyright); terrain: © IGN – LiDAR HD (retrieved 2026-10), Licence Ouverte 2.0, modified; horizon: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+}

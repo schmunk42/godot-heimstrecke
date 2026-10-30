@@ -1,0 +1,20 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-27 13:45:00 UTC. Views of the zypern-ayia-napa world (local metres, frame EPSG:32636, y relative to base_height 5.94 m): both route waypoints from the default offset and close up, Nissi Beach and the town centre from the sea, an overview of the coast from the south-west, three signs from 14 m in front (town sign of Ayia Napa, a blue sign towards Larnaca and Famagusta, a green motorway sign).",
+  "views": [
+    {"name": "route-start", "waypoint": 0},
+    {"name": "route-end", "waypoint": 1},
+    {"name": "route-end-street", "waypoint": 1, "offset": [0, 5, 25]},
+    {"name": "nissi-beach", "position": [-42.0, 60.0, 750.0],
+     "look_at": [-42.0, 0.0, 250.0]},
+    {"name": "ayia-napa-town", "position": [2969.0, 120.0, 900.0],
+     "look_at": [2969.0, 10.0, 0.0]},
+    {"name": "coast-overview", "position": [-3500.0, 600.0, 3000.0],
+     "look_at": [500.0, 0.0, 0.0]},
+    {"name": "sign-town", "position": [1994.8, 9.2, -4.9],
+     "look_at": [2008.9, 9.1, -7.6]},
+    {"name": "sign-primary", "position": [3273.6, 84.8, -4466.1],
+     "look_at": [3260.7, 84.6, -4472.2]},
+    {"name": "sign-motorway", "position": [2720.9, 98.6, -1515.5],
+     "look_at": [2733.1, 98.4, -1522.9]}
+  ]
+}

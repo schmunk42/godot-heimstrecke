@@ -1,0 +1,57 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 13:55:00 UTC. Start points for the drive menu along the T 50: lat/lon is a point of the named T 50 section from the built extract, snapped to the nearest drivable edge of that road; a start faces along the route, from Aléria to Corte (pipeline/starts.py). The first entry is the route start (the T 50 stage from Aléria to Corte).",
+  "starts": [
+    {
+      "name": "Etappe Aléria – Corte",
+      "route_start": true
+    },
+    {
+      "name": "Corte (T 50)",
+      "road": "Route d'Aleria",
+      "at": [
+        42.3026,
+        9.15995
+      ]
+    },
+    {
+      "name": "Strada Territuriale (T 50)",
+      "road": "Strada Territuriale",
+      "at": [
+        42.24837,
+        9.21539
+      ]
+    },
+    {
+      "name": "Tavignano-Tal (T 50)",
+      "road": "Strada di u Fiuminale di Tavignanu",
+      "at": [
+        42.21948,
+        9.27318
+      ]
+    },
+    {
+      "name": "Vor dem Tunnel de l'Isolella",
+      "road": "RT 50",
+      "at": [
+        42.2079,
+        9.34674
+      ]
+    },
+    {
+      "name": "Aléria, Richtung Corte",
+      "road": "Strada di Corti",
+      "at": [
+        42.1138,
+        9.50028
+      ]
+    },
+    {
+      "name": "Aléria Zentrum (T 10)",
+      "road": "Corsu San Lisandru Sauli",
+      "at": [
+        42.11558,
+        9.51333
+      ]
+    }
+  ]
+}

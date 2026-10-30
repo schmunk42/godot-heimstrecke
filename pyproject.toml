@@ -1,0 +1,20 @@
+# file generated with AI assistance: Claude Code - 2026-10-20 18:20:00 UTC
+[project]
+name = "heimstrecke-pipeline"
+version = "0.0.0"
+description = "Turns OpenStreetMap and elevation data into drivable glTF tiles"
+requires-python = ">=3.12"
+dependencies = [
+    "osmium>=4.0",
+    "shapely>=2.0",
+    "pyproj>=3.6",
+    "rasterio>=1.4",
+    "numpy>=2.0",
+    "trimesh>=4.4",
+    "mapbox-earcut>=1.0",
+    "requests>=2.32",
+    "jsonschema>=4.26.0",
+]
+
+[tool.uv]
+package = false

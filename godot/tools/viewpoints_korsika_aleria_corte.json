@@ -1,0 +1,15 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 14:20:00 UTC. Overview views of the korsika-aleria-corte strip (local metres of the turned frame, x along the T 50 from Corte to Aleria, y relative to base_height 372.02 m).",
+  "views": [
+    {"name": "corte", "position": [-17600.0, 140.0, -1500.0],
+     "look_at": [-19400.0, 80.0, -1000.0]},
+    {"name": "tavignano-valley", "position": [-6500.0, 150.0, 1500.0],
+     "look_at": [-2000.0, -200.0, 800.0]},
+    {"name": "isolella-tunnel", "position": [-300.0, -80.0, -1600.0],
+     "look_at": [2600.0, -170.0, -900.0]},
+    {"name": "aleria-plain", "position": [15500.0, -250.0, 700.0],
+     "look_at": [21000.0, -370.0, -300.0]},
+    {"name": "strip-overview", "position": [-21500.0, 1300.0, 2500.0],
+     "look_at": [0.0, -200.0, 0.0]}
+  ]
+}

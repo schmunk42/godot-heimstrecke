@@ -1,0 +1,43 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-23 00:00:00 UTC. Prepared world, not built yet; the route to the other world follows later.",
+  "schema": 1,
+  "id": "crailsheim",
+  "name": "Crailsheim",
+  "version": "1",
+  "min_game": "0.1.0",
+  "center": [
+    49.137,
+    10.072
+  ],
+  "size_km": 10,
+  "horizon_km": 40,
+  "bbox": [
+    9.997,
+    49.087,
+    10.147,
+    49.187
+  ],
+  "osm_region": "europe/germany/baden-wuerttemberg/stuttgart-regbez",
+  "starts": "starts.json",
+  "sources": [
+    {
+      "name": "OpenStreetMap",
+      "licence": "ODbL",
+      "url": "https://www.openstreetmap.org/copyright",
+      "credit": "© OpenStreetMap contributors"
+    },
+    {
+      "name": "DGM1 Baden-Württemberg",
+      "licence": "dl-de/by-2-0",
+      "url": "https://www.lgl-bw.de",
+      "credit": "Datenquelle: LGL, www.lgl-bw.de, dl-de/by-2-0 (verändert)"
+    },
+    {
+      "name": "Copernicus DEM",
+      "licence": "COPERNICUS",
+      "url": "https://spacedata.copernicus.eu",
+      "credit": "produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+    }
+  ],
+  "attribution": "Data: © OpenStreetMap contributors (ODbL, openstreetmap.org/copyright); terrain: Datenquelle: LGL, www.lgl-bw.de, dl-de/by-2-0 (verändert); horizon: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+}

@@ -1,0 +1,17 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-27 13:30:00 UTC. Clipping ratchet of the world zypern-ayia-napa for pipeline/clipping.py, read by metrics.clipping_baseline from the directory of the recipe. Measured on feature/world-zypern ee9d11b with `make world W=zypern-ayia-napa` (the first build of this world; the branch adds epsg and gedtm30, which this world needs) and confirmed on 6cdda35 (the biome mediterranean-dry changes colours only, the counts are the same), the counts of metrics.json block clipping. A kind may exceed its count by clipping.RATCHET_SLACK (rounded up), the total of the measured kinds may not exceed theirs.",
+  "center": [34.99, 33.967],
+  "size_km": 10,
+  "date": "2026-10-27",
+  "commit": "6cdda35",
+  "counts": {
+    "zfight": {"count": 8, "measured": true},
+    "overlap": {"count": 18, "measured": true},
+    "median": {"count": 177, "measured": true},
+    "width_step": {"count": 0, "measured": true},
+    "terrain_above": {"count": 0, "measured": true},
+    "bank_buried": {"count": null, "measured": false},
+    "skirt_cross": {"count": 44, "measured": true},
+    "dip": {"count": 19, "measured": true}
+  }
+}

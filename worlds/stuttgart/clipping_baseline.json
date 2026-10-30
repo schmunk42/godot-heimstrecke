@@ -1,0 +1,17 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-10-22 23:40:00 UTC. Clipping ratchet of the world stuttgart for pipeline/clipping.py, read by metrics.clipping_baseline from the directory of the recipe (build.py --recipe worlds/stuttgart/world.json); a world without this file reports the informational gate SKIPPED, and so does a build whose centre and size (compared rounded to 3 decimals) differ from `center` and `size_km` here. The counts per kind are those of the reference build; the gate fails when a kind with a measured count has more findings. Measured on origin/main d1b1fa0 (before net.half, the width taper, banks and road priority): `git archive d1b1fa0 pipeline | tar -x -C <scratch>/main/`, the current clipping.py and priority.py (for priority.valid) placed beside that pipeline, and a script that replays build.main() up to emit_markings with the arguments `make world` used then (extract.pkl, dgm1_509_5398_12.tif, centre 48.790,9.200, size 10) and calls check_clipping(net, ground, base, tiles.half). The old pipeline has no net.half, walk_keep, skirt_feet or bank_tops: clipping.py takes the half width per edge, every assigned sidewalk as drawn and and skirt_cross and bank_buried (no banks there) are not measured, so the ratchet ignores them. A kind may exceed its count by clipping.RATCHET_SLACK (rounded up), the total of the measured kinds may not exceed theirs.",
+  "center": [48.79, 9.2],
+  "size_km": 10,
+  "date": "2026-10-23",
+  "commit": "d1b1fa0",
+  "counts": {
+    "zfight": {"count": 190, "measured": true},
+    "overlap": {"count": 408, "measured": true},
+    "median": {"count": 2203, "measured": true},
+    "width_step": {"count": 1082, "measured": true},
+    "terrain_above": {"count": 2, "measured": true},
+    "bank_buried": {"count": null, "measured": false},
+    "skirt_cross": {"count": null, "measured": false},
+    "dip": {"count": 34, "measured": true}
+  }
+}

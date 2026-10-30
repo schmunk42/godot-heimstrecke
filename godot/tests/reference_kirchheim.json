@@ -1,0 +1,8 @@
+{
+  "hostname": "workhorse-2.lab-1-ci30.de",
+  "measured_at": "2026-10-26T11:36:47Z",
+  "physics_ticks_per_second": 120,
+  "accel_0_50_s": 2.35,
+  "brake_30_0_s": 0.675,
+  "load_ms": 5106
+}

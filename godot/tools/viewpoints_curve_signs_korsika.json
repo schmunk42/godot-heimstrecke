@@ -1,0 +1,44 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 19:10:00 UTC. Korsika: Aléria – Corte, the pace note signs on the T 50 stage: the turn from the T 10 onto the T 50 (right 1, three signs), a right 4 and the left 6 east of the Tavignano bridge (two each), seen from 2 m above the route 30 m before the first sign.",
+ "views": [
+  {
+   "name": "co-t50-junction",
+   "position": [
+    17719.8,
+    -360.8,
+    -571.7
+   ],
+   "look_at": [
+    17787.0,
+    -360.7,
+    -495.7
+   ]
+  },
+  {
+   "name": "co-right-4",
+   "position": [
+    16587.3,
+    -358.8,
+    285.3
+   ],
+   "look_at": [
+    16514.3,
+    -357.7,
+    352.7
+   ]
+  },
+  {
+   "name": "co-left-6",
+   "position": [
+    14861.1,
+    -354.3,
+    -98.3
+   ],
+   "look_at": [
+    14757.7,
+    -355.6,
+    -101.3
+   ]
+  }
+ ]
+}

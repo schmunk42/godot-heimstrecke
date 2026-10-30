@@ -1,0 +1,44 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-10-26 19:10:00 UTC. Kirchheim: the pace note signs before a right 1 (three, red), a right 4 into left 4 (two, both pairs on one sign) and a left 1, seen from 2 m above the route 30 m before the first sign.",
+ "views": [
+  {
+   "name": "kh-right-1",
+   "position": [
+    -1442.9,
+    -10.7,
+    -1311.4
+   ],
+   "look_at": [
+    -1474.4,
+    -4.9,
+    -1217.3
+   ]
+  },
+  {
+   "name": "kh-into",
+   "position": [
+    13.3,
+    32.7,
+    1672.0
+   ],
+   "look_at": [
+    91.7,
+    39.9,
+    1729.8
+   ]
+  },
+  {
+   "name": "kh-left-1",
+   "position": [
+    -1723.8,
+    52.2,
+    -92.5
+   ],
+   "look_at": [
+    -1729.7,
+    50.4,
+    8.1
+   ]
+  }
+ ]
+}
