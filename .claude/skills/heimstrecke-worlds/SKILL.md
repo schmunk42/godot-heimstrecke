@@ -1,6 +1,6 @@
 ---
 name: heimstrecke-worlds
-description: Use when creating, changing or debugging a Heimstrecke world or the world pipeline (pipeline/*.py, worlds/<id>/): recipe, data sources (OSM, DGM1, LiDAR HD, Copernicus, OSRM), sea, biome, turned worlds, road heights, terrain conform, clipping and z-fighting, tunnels, bridges, sidewalks, start points, gates, packaging, licences. Not for cars or audio.
+description: Use when creating, changing or debugging a Heimstrecke world or the world pipeline (pipeline/*.py, worlds/<id>/): recipe, data sources (OSM, DGM1, LiDAR HD, Copernicus, OSRM), sea, biome, turned worlds, road heights, terrain conform, clipping, z-fighting, flicker and shimmer, sun and shadows, tunnels, bridges, sidewalks, start points, gates, packaging, licences. Also load it on any feedback about how a world looks or drives (a screenshot, a screen recording, the # position line, "flickers", "floats", "clips"), and fold the lesson back into this skill. Not for cars or audio.
 ---
 <!-- file generated with AI assistance: Claude Code - 2026-10-23 14:50:00 UTC -->
 
@@ -48,23 +48,35 @@ Full text: `docs/world-creation.md` (how a world is made, constants, known limit
 
 - Hard gates (exit 3): `shared_heights`, `terrain_below_roads`, `max_grade` (25 %), `node_heights` (2 m). The clipping report is a ratchet against the committed baseline with 2 % slack.
 - Recipe switches (`terrain`, `biome`, `width_km`, `heading_deg`) must leave the default path untouched: the square temperate worlds stay byte-identical, Stuttgart and Bavella are the references. `half` is a scalar or `[hx, hy]`, unpack it with `np.broadcast_to(half, 2)`.
-- Before a change: build the unchanged `main` into a baseline directory. A refactor must keep `sha256sum tile_*.glb horizon.glb` identical; commit it separately before the behaviour change. Two builds of the same code are byte-identical; if not, something is non-deterministic.
+- Before a change: build the unchanged `master` into a baseline directory. A refactor must keep `sha256sum tile_*.glb horizon.glb` identical; commit it separately before the behaviour change. Two builds of the same code are byte-identical; if not, something is non-deterministic.
 - Do not judge geometry on a substitute raster (Copernicus as DGM1): grade, braking and tunnel checks fail for no good reason.
 - Smoke test: steered drives (`smoke.json`), because a straight drive does not reach a portal. Do not rewrite `reference_<id>.json` unless `car.gd` changed.
 - A route start or start point must lie on a drivable road with free space around it.
 - Do not change the car (`car.gd`) in world work.
 - Screenshots (software render, no shadows) illustrate, the metrics are the gate. Software renders show fewer minor roads than a GPU.
 
+## Look on the GPU
+
+- Ask for the `#` position line and a 3-5 s screen recording (the user's recordings land in `~/Videos/`). Extract frames with `ffmpeg -i <mp4> -vf fps=4 f%03d.png`, then crop the same region from two consecutive frames at full resolution and compare them side by side; one frame shows no flicker.
+- Tell the two flickers apart: z-fighting is two coplanar surfaces swapping (whole patches, also with a still camera); shadow shimmer is a fine dot or diagonal raster on lit faces and at shadow edges that moves on the slightest camera move. The 2026-11-03 report "textures flicker" was shadow shimmer, the buildings have no textures.
+- The sun is built in `world.gd` (`_setup_environment`): its shadow range follows the tree shadows (`trees.gd`, up to 450 m), currently 500 m with blend splits, `shadow_bias` 0.15, `shadow_normal_bias` 1.5 and an 8192 shadow map in `project.godot`. A longer range coarsens the near texels (1500 m shimmered); walls nearly parallel to the sun show acne when the biases drop.
+- The software render (`make render`) cannot confirm a GPU look fix: it runs without shadows and draws stipple with them. The user checks with `make drive`.
+
 ## Host (workhorse, 4 vCPU, 7.6 GiB, shared)
 
-`cat /proc/loadavg` below 4 and `free -h` above 1 GiB before downloads, builds, renders; `nice -n 19`; one heavy job at a time; no database containers. Docker cannot see `/tmp`, render from a path under the home directory. A worktree has no `data/`: symlink `data/raw` from the main checkout. Areas much larger than 10 km are built on a developer machine.
+`cat /proc/loadavg` below 4 and `free -h` above 1 GiB before downloads, builds, renders; `nice -n 19`; one heavy job at a time; no database containers. Docker cannot see `/tmp`, render from a path under the home directory. A worktree has no `data/`: symlink `data/raw` from the main checkout and `cp -a` `data/out` (about 430 MB). Its first `make test` imports all assets into a fresh `.godot/` and loads in about 14 s against the 15 s limit; a second run is the measurement. Areas much larger than 10 km are built on a developer machine.
 
 ## Process
 
-Feature branch in its own worktree off `origin/main`, Conventional Commits with `[*]`, no amend, no force push, additive merge of `origin/main` on conflicts. Report deviations over 10 % from expected numbers instead of accepting them. Update `docs/world-creation.md` when a rule here changes.
+The main branch is `master`. Larger work runs on a branch in its own worktree and is fast-forwarded into `master`; small fixes may be committed on `master` directly (the developer allows it, `HRZG_GUARD_OFF` in the local settings). Conventional Commits with `[*]`, no amend, no force push, additive merge of `origin/master` on conflicts. Report deviations over 10 % from expected numbers instead of accepting them. Update `docs/world-creation.md` when a rule here changes.
+
+## Feedback improves this skill
+
+After acting on feedback about a world (a bug report, a screenshot, a recording, a correction of how you worked), add what was learnt here before closing the task: one rule with its reason, in the section it belongs to, a date where it helps, and a `revised` line at the end. Change a rule that turned out wrong instead of adding a second one beside it. Leave out what the code or `docs/` already say; point to them. Commit the skill change with the fix.
 <!-- - revised 2026-10-23 (LiDAR HD, sea, biome, turned worlds) -->
 <!-- - revised 2026-10-25 (buildings under roads) -->
 <!-- - revised 2026-10-25 (terrain sources outside Germany and France) -->
 <!-- - revised 2026-10-25 (tracks) -->
 <!-- - revised 2026-10-27 (GEDTM30, epsg, mediterranean-dry, signs outside DE/FR) -->
 <!-- - revised 2026-10-27 (signs in Cyprus) -->
+<!-- - revised 2026-11-03 (GPU look and shadow shimmer, worktree data/out, master, feedback loop) -->
