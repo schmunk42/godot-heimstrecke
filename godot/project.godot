@@ -16,6 +16,7 @@ window/size/viewport_height=900
 [rendering]
 
 anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=8192
 textures/vram_compression/import_etc2_astc=true
 
 [physics]
@@ -24,3 +25,4 @@ textures/vram_compression/import_etc2_astc=true
 common/physics_ticks_per_second=120
 ; - revised 2026-10-22 (game version 0.1.0 for world min_game)
 ; - revised 2026-10-22 (world selection as main scene)
+; - revised 2026-11-03 (directional shadow map 8192)

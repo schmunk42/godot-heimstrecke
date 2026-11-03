@@ -692,7 +692,13 @@ func _setup_environment() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-40.0, -30.0, 0.0)
 	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 1500.0
+	# 500 m covers the tree shadows (trees.gd, up to 450 m); 1500 m made
+	# the near shadow texels so coarse that they shimmered on every camera
+	# move. The biases keep walls almost parallel to the sun free of acne.
+	sun.directional_shadow_max_distance = 500.0
+	sun.directional_shadow_blend_splits = true
+	sun.shadow_bias = 0.15
+	sun.shadow_normal_bias = 1.5
 	add_child(sun)
 # - revised 2026-10-22 (world.json manifest)
 # - revised 2026-10-22 (world loader)
@@ -708,3 +714,4 @@ func _setup_environment() -> void:
 # - revised 2026-10-26 (route choice, free drive, chevrons and boards)
 # - revised 2026-10-26 (pace notes and curve signs in the route log line)
 # - revised 2026-10-26 (G toggles the route band)
+# - revised 2026-11-03 (sun shadows: shorter range, blend splits, bias)
