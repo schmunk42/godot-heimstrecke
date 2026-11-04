@@ -221,6 +221,7 @@ func _setup_drive() -> void:
 	_car.reset_requested.connect(_reset_car)
 	_car.road_requested.connect(_put_on_road)
 	_place_car_at(0)
+	_add_co_driver()
 	_camera.set_script(preload("res://scripts/chase_cam.gd"))
 	_camera.target = _car
 	add_child(_camera)
@@ -386,14 +387,22 @@ func _set_route(index: int) -> void:
 	var boards: int = _route_marks.build(_route, _roads,
 		CAR.LAYER_BUILDINGS if drive else 0)
 	_route_marks.show_band(_show_band)
-	if drive and _car != null:
-		_co_driver = CO_DRIVER.new()
-		_co_driver.on = _co_driver_on
-		_route_marks.add_child(_co_driver)
-		_co_driver.setup(_route_marks, _car)
+	_add_co_driver()
 	print("route %s: %d boards, %d pace notes, %d curve signs in %d ms"
 		% [_routes[index].id, boards, _route_marks.notes.size(),
 		_route_marks.signs, Time.get_ticks_msec() - started])
+
+
+## The co-driver who calls the pace notes of the shown route, in the
+## drive scene once there is a car: _ready() shows the route before
+## _setup_drive() makes the car, so both call this.
+func _add_co_driver() -> void:
+	if not drive or _car == null or _route_marks == null:
+		return
+	_co_driver = CO_DRIVER.new()
+	_co_driver.on = _co_driver_on
+	_route_marks.add_child(_co_driver)
+	_co_driver.setup(_route_marks, _car)
 
 
 ## The direction chosen in the menu: false from the route's first point

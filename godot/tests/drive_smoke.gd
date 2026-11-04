@@ -2,7 +2,8 @@
 extends SceneTree
 ## Headless smoke test for the drive scene: settle 2 s, full throttle 6 s,
 ## steer right 1.5 s without throttle, brake. The car must stay upright.
-## Then every start point of the menu: the car must settle upright on it.
+## With a route the co-driver must be there. Then every start point of
+## the menu: the car must settle upright on it.
 ## Then the car is moved 25 m off the road, rolled onto its side, and F
 ## must put it back upright; with road lines (roads.bin) on a road.
 ## Then the world's own runs from ../worlds/<world id>/smoke.json, in
@@ -114,6 +115,7 @@ func _run(world: Node, load_ms: int) -> void:
 			"brake_30_0_s": -1.0, "load_ms": load_ms, "timed": false})
 		return
 
+	_check(world.get("_co_driver") != null, "co-driver on the route")
 	await _ticks(roundi(2.0 * _tps))
 	var start := car.global_position
 	_sample("settled", car)
