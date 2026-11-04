@@ -9,12 +9,16 @@ extends Node
 ## called, and a jump along the route (R, F, a new start) starts over from
 ## the car's place.
 ##
-## The voice is one short clip per word (clip_words()), looked for as
-## <word>.wav or <word>.ogg in user://codriver/ and res://audio/codriver/
-## and read from the file, so they need no import. A word without a clip
-## is skipped (and reported once), a call without any clip is silent; the
-## game has no voice files yet. The clips play on the bus "CoDriver", a
-## radio: band-pass 400 to 3200 Hz and a little distortion.
+## The voice is one short clip per word, one per grade with its direction
+## ("4_right", "hairpin_left") and one per such pair after "into" and
+## "and" ("into_3_left"), see clip_words(); a phrase is said as one and
+## taken over its words when its clip is there. A clip is
+## looked for as <name>.wav or <name>.ogg in user://codriver/ and
+## res://audio/codriver/ and read from the file, so it needs no import
+## (the game's clips have the importer "keep", made by
+## tools/codriver_voice.py). A word without a clip is skipped (and
+## reported once). The clips play on the bus "CoDriver", a radio:
+## band-pass 400 to 3200 Hz and a little distortion.
 
 const PACE_NOTES := preload("res://scripts/pace_notes.gd")
 const LEAD_S := 6.0
@@ -25,6 +29,8 @@ const RESYNC_M := 100.0
 const BUS := "CoDriver"
 const DIRS := ["user://codriver", "res://audio/codriver"]
 const EXTENSIONS := ["wav", "ogg"]
+## the most words one clip says ("into_3_left")
+const PHRASE_WORDS := 3
 
 ## a call starts: the words as text
 signal said(text: String)
@@ -46,8 +52,9 @@ var _queue: Array[AudioStream] = []
 var _clips := {}
 
 
-## Every word the co-driver says: the grades, the directions, the
-## modifiers, the links and the distances.
+## Every clip the co-driver plays: the grades, the directions, the
+## modifiers, the links, the distances, each grade with its direction and
+## that pair after a link (phrase()).
 static func clip_words() -> Array[String]:
 	var words: Array[String] = []
 	for grade in range(1, 7):
@@ -56,7 +63,20 @@ static func clip_words() -> Array[String]:
 		"open", "into", "and"])
 	for d: int in PACE_NOTES.DISTANCES:
 		words.append(str(d))
+	var pairs: Array[String] = []
+	for grade: String in words.slice(0, 7):  # 1 to 6 and hairpin
+		for side: String in ["left", "right"]:
+			pairs.append(phrase([grade, side]))
+	words.append_array(pairs)
+	for link: String in ["into", "and"]:
+		for pair in pairs:
+			words.append(phrase([link, pair]))
 	return words
+
+
+## The clip name of `words` said as one ("4_right", "into_3_left").
+static func phrase(words: Array) -> String:
+	return "_".join(words)
 
 
 ## How far ahead a curve is called at `speed_kmh`.
@@ -117,11 +137,27 @@ func _physics_process(_delta: float) -> void:
 		say(call.words)
 
 
+## The clip names to play for `words`: the longest phrase of up to
+## PHRASE_WORDS words from each place on that `has` (called with a clip
+## name) finds a clip for, else the word.
+static func clip_names(words: Array[String], has: Callable) -> Array[String]:
+	var names: Array[String] = []
+	var i := 0
+	while i < words.size():
+		var count := mini(PHRASE_WORDS, words.size() - i)
+		while count > 1 and not has.call(phrase(words.slice(i, i + count))):
+			count -= 1
+		names.append(phrase(words.slice(i, i + count)))
+		i += count
+	return names
+
+
 ## Says `words`: queues their clips and starts playing when idle.
 func say(words: Array[String]) -> void:
 	said.emit(" ".join(words))
-	for word in words:
-		var clip := _clip(word)
+	var has := func(name: String) -> bool: return _clip(name, false) != null
+	for name in clip_names(words, has):
+		var clip := _clip(name)
 		if clip != null:
 			_queue.append(clip)
 	if not _player.playing:
@@ -135,11 +171,12 @@ func _play_next() -> void:
 	_player.play()
 
 
-## The clip of `word`, null (and a message once) when there is none.
-func _clip(word: String) -> AudioStream:
+## The clip of `word`, null (and a message once, when `report`) when there
+## is none.
+func _clip(word: String, report := true) -> AudioStream:
 	if not _clips.has(word):
 		_clips[word] = _load(word)
-		if _clips[word] == null:
+		if _clips[word] == null and report:
 			print("co-driver: no clip for \"%s\" in %s" % [word, DIRS])
 	return _clips[word]
 

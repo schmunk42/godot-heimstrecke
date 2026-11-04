@@ -24,7 +24,7 @@ A world can also be given on the command line, a `.world` file or a world direct
 
 ## Drive
 
-W/S throttle and brake, A/D steer, Space handbrake, F puts the car onto the nearest road (or back upright where it is in a world without road lines), R back to the start, V switches the camera (far, close, driver's seat), M mutes the co-driver who calls the pace notes of the route (once voice clips exist), # shows and copies the position (world, road, lat/lon, camera) for bug reports with a screenshot. In the start menu C switches the car, a click on the map starts on the nearest road there. A minimap sits at the bottom right; signs stand at the roads in the style of the country.
+W/S throttle and brake, A/D steer, Space handbrake, F puts the car onto the nearest road (or back upright where it is in a world without road lines), R back to the start, V switches the camera (far, close, driver's seat), M mutes the co-driver who calls the pace notes of the route, # shows and copies the position (world, road, lat/lon, camera) for bug reports with a screenshot. In the start menu C switches the car, a click on the map starts on the nearest road there. A minimap sits at the bottom right; signs stand at the roads in the style of the country.
 
 ## Build from source
 

@@ -20,7 +20,7 @@ COP_URL := https://copernicus-dem-30m.s3.amazonaws.com
 COP_TILE = $(subst _,_00_,$*)_00
 
 # Goals that need no recipe; everything else reads it once.
-NO_RECIPE_GOALS := help init clean build render export-image export public
+NO_RECIPE_GOALS := help init clean build render export-image export public voice
 define NL
 
 
@@ -58,7 +58,7 @@ EXPORT_IMAGE ?= heimstrecke-export:$(GODOT_VERSION)
 # a failed step must not leave a fresh-looking output behind
 .DELETE_ON_ERROR:
 .PHONY: help init download extract world rebuild-world pack drive up fly \
-	test test-notes test-gates test-codriver dev clean build render export-image export public
+	test test-notes test-gates test-codriver voice dev clean build render export-image export public
 
 # Help based on https://gist.github.com/prwhite/8168133 thanks to @nowox and @prwhite
 # And add help text after each target name starting with '\#\#'
@@ -160,6 +160,9 @@ test-gates: ##@test check gate spacing and barrier arcs of a synthetic route (no
 test-codriver: ##@test check when the co-driver calls the pace notes (no world needed)
 	@$(STEP) "co-driver test (headless)" \
 		$(GODOT) --headless --path godot --script res://tests/co_driver_test.gd
+
+voice: ##@game synthesise the co-driver's clips into godot/audio/codriver/ (Piper, model into data/raw/piper/)
+	uv run --script tools/codriver_voice.py $(RAW)/piper godot/audio/codriver
 
 dev: download world drive ##@game everything from a fresh checkout: download, build, drive
 
