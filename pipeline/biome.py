@@ -8,7 +8,11 @@ rock. mediterranean (Corsica) has drier, yellower ground and horizon,
 grey rock on OSM bare rock and scree, above ROCK_FROM_M and on slopes
 steeper than ROCK_SLOPE, and four tree kinds: holm oak, pine (maritime
 and laricio pine, the umbrella crown of the stone pine), cypress for
-mapped Cupressus and shrubs (the maquis) on natural=scrub/heath. Its
+mapped Cupressus and shrubs (the maquis) on natural=scrub/heath. In
+Corsica (MAQUIS) the maquis also covers the land without another cover
+below MAQUIS["top_m"], as a nearly closed canopy of wide shrubs over a
+dark olive ground: OSM maps only a part of it, and the island's hills are
+dark green, not bare. Its
 houses have terracotta, ochre, salmon and granite facades under tile-red
 roofs (FACADES, ROOF), and a house standing alone outside the urban land
 cover (fewer than ISOLATED_NEIGHBOURS others within ISOLATED_M) without
@@ -41,10 +45,11 @@ MEDITERRANEAN = ("mediterranean", "mediterranean-dry")
 PALETTES = {
     "temperate": {"scrub": (0.45, 0.68, 0.33)},
     "mediterranean": {
-        "default": (0.60, 0.57, 0.34),
+        # the ground under the maquis (land without another cover)
+        "default": (0.30, 0.35, 0.18),
         "green": (0.56, 0.56, 0.32),
         "farmland": (0.66, 0.60, 0.36),
-        "scrub": (0.42, 0.48, 0.26),
+        "scrub": (0.30, 0.35, 0.18),
         "forest": (0.30, 0.36, 0.20),
         "sand": (0.86, 0.80, 0.62),
         "rock": (0.50, 0.47, 0.44),
@@ -75,6 +80,13 @@ GROUND_SLOPE = {"mediterranean": (0.15, 0.6, 0.22),
 # metres (incommensurate, so no visible repeat)
 GROUND_MOTTLE = {"mediterranean": (0.07, (173.0, 61.0, 23.0)),
                  "mediterranean-dry": (0.07, (173.0, 61.0, 23.0))}
+
+# Corsica: maquis on the land without another cover up to top_m (above,
+# the rock by height takes over), on a grid of step m (jitter in
+# trees.SHRUB_JITTER), shrubs h m high with a crown spread times as wide,
+# so the crowns nearly touch
+MAQUIS = {"mediterranean": {"top_m": 1300.0, "step": 7.0,
+                            "h": (1.5, 3.5), "spread": (3.0, 4.2)}}
 
 # facade colours: (share, from, to); the share picks by the centroid hash
 # (build.facade_color), the colour runs from `from` to `to` within it
@@ -138,3 +150,4 @@ def rock_share(biome, heights, slope):
 # - revised 2026-10-23 (facades, roofs, single-storey houses)
 # - revised 2026-10-27 (mediterranean-dry)
 # - revised 2026-11-04 (darker mediterranean ground, slope shade, mottle)
+# - revised 2026-11-04 (Corsican maquis on untagged land, darker ground)

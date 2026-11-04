@@ -24,6 +24,7 @@ Full text: `docs/world-creation.md` (how a world is made, constants, known limit
 - Sea comes from the OSM coastline (land left, sea right); NaN inland stays NaN on purpose, never fill it silently.
 - Copernicus is a surface model, 2.5 to 6 m too high: horizon only. Pick its 1° tiles from the **horizon** square.
 - Outside Germany and France: `"terrain": "gedtm30"` (since 2026-10-27), a window of the global GEDTM30 COG, no key. Its file says `scale 0.1`, the values are metres; sea is no data. 30 m is a substitute raster: measure the gates, do not loosen them (Ayia Napa passes all four). The UTM zone comes from the recipe's `epsg` (default 25832, a raster in another zone gets `_<epsg>` in its name). Look for an open 1 m model of the country first; alternatives and licences in `docs/world-creation.md`, "Terrain sources outside Germany and France".
+- Corsica is maquis, not bare ground (2026-11-04, compared with Street View on the D 268): OSM maps only part of it, so `biome.MAQUIS` fills the land without another cover below 1300 m and below the first rock slope with wide shrubs over a dark olive ground. It costs instances: Bavella went from 2.8 to 3.8 million plants; watch load time and render memory. For a look question, open Street View at the `#` position (`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=<lat>,<lon>&heading=<deg>&pitch=<deg>`).
 - Signs know `de`, `fr` and `cy` (`country_of()` from the Geofabrik path); any other country gets the German style. Cyprus: signs on the left (`LEFT_HAND`), Greek over Latin from the places' name variants (`extract.PLACE_NAMES`), motorway green, B roads and signposts blue.
 - `fetch.py` deletes the zips after building the GeoTIFF: keep the GeoTIFF, copy it from another machine if `opengeodata.lgl-bw.de` is down. DGM1 stops at the state border (nodata cells, Crailsheim 0.3 %).
 - An old `extract.pkl` (changed `ROAD_TAGS`) makes `build.py` exit 2; `make world` re-extracts. Every recipe edit re-extracts.
@@ -87,3 +88,4 @@ After acting on feedback about a world (a bug report, a screenshot, a recording,
 <!-- - revised 2026-11-04 (texture stripes shimmer, red and white only straight on, render_props for looks) -->
 <!-- - revised 2026-11-04 (flat look: linear vertex colours, ambient, SSAO, ground shade) -->
 <!-- - revised 2026-11-04 (inland water as a surface) -->
+<!-- - revised 2026-11-04 (Corsican maquis, Street View link) -->

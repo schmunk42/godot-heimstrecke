@@ -23,7 +23,10 @@ untagged forests get more
 pines with height (PINE_BY_HEIGHT, laricio above, holm oak below),
 mapped Cupressus become cypresses, and natural=scrub/heath outside
 forest and rock is filled with shrubs (the maquis) on a SHRUB_STEP grid,
-a few holm oaks among them; shrubs get no collision trunk. The shrubs
+a few holm oaks among them; shrubs get no collision trunk. A biome
+with MAQUIS (Corsica) also fills the land without another cover below
+its top_m and below the first rock slope (biome.ROCK_SLOPE, bare
+granite), denser and with wider crowns. The shrubs
 draw from their own seeded RNG, so the other trees are the same as
 without them.
 
@@ -39,7 +42,7 @@ without trees or trunks has no such file.
 import numpy as np
 import shapely
 
-from biome import KINDS, MEDITERRANEAN
+from biome import KINDS, MAQUIS, MEDITERRANEAN, ROCK_SLOPE
 from frame import xyz
 from roads import road_width
 from sidewalks import WIDTH as SIDEWALK
@@ -233,7 +236,8 @@ def build_trees(ex, frame, net, cover, buildings, ground, base, tiles,
     trees.kinds = KINDS[biome]
     if med:
         _add_maquis(trees, cover, half, road_tree, road_half,
-                    building_tree, building_clear, blocked, stats)
+                    building_tree, building_clear, blocked, stats,
+                    MAQUIS.get(biome), ground)
     trees.ground = ground.height(trees.x, trees.y) - base - SINK
     stats.update(total=int(len(trees.x)),
                  conifer=int(np.count_nonzero(trees.kind == 1)),
@@ -243,37 +247,54 @@ def build_trees(ex, frame, net, cover, buildings, ground, base, tiles,
 
 
 def _add_maquis(trees, cover, half, road_tree, road_half, building_tree,
-                building_clear, blocked, stats):
+                building_clear, blocked, stats, maquis=None, ground=None):
     """Shrubs and a few holm oaks on scrub outside forest and rock,
-    appended to trees (own RNG, so the other trees stay the same)."""
+    appended to trees (own RNG, so the other trees stay the same); with
+    `maquis` (biome.MAQUIS) also on the land without another cover below
+    its top_m (ground: the raster, absolute heights)."""
     scrub = cover.get("scrub")
-    if scrub is None:
+    if scrub is None and maquis is None:
         stats["shrub"] = 0
         return
+    step = SHRUB_STEP if maquis is None else maquis["step"]
     rng = np.random.default_rng(SEED + 1)
     hx, hy = np.broadcast_to(half, 2)
-    gx, gy = np.meshgrid(np.arange(int(2 * hx / SHRUB_STEP)),
-                         np.arange(int(2 * hy / SHRUB_STEP)))
-    sx = -hx + (gx.ravel() + 0.5) * SHRUB_STEP
-    sy = -hy + (gy.ravel() + 0.5) * SHRUB_STEP
+    gx, gy = np.meshgrid(np.arange(int(2 * hx / step)),
+                         np.arange(int(2 * hy / step)))
+    sx = -hx + (gx.ravel() + 0.5) * step
+    sy = -hy + (gy.ravel() + 0.5) * step
     sx = sx + rng.uniform(-SHRUB_JITTER, SHRUB_JITTER, len(sx))
     sy = sy + rng.uniform(-SHRUB_JITTER, SHRUB_JITTER, len(sy))
-    keep = shapely.contains_xy(scrub, sx, sy)
-    sx, sy = sx[keep], sy[keep]
+    keep = np.zeros(len(sx), bool) if scrub is None \
+        else shapely.contains_xy(scrub, sx, sy)
+    untagged = np.zeros(len(sx), bool)
+    if maquis is not None:
+        h0 = ground.height(sx, sy)
+        rise = np.hypot(ground.height(sx + 1.0, sy) - h0,
+                        ground.height(sx, sy + 1.0) - h0)
+        untagged = ~keep & (h0 < maquis["top_m"]) \
+            & (rise < ROCK_SLOPE.get("mediterranean", (np.inf,))[0])
+        for kind, g in cover.items():
+            if g is not None and kind != "scrub":
+                untagged &= ~shapely.contains_xy(g, sx, sy)
+        keep |= untagged
+    sx, sy, untagged = sx[keep], sy[keep], untagged[keep]
     keep = ~blocked(sx, sy)
     for kind in ("forest", "rock"):
         if cover.get(kind) is not None:
             keep &= ~shapely.contains_xy(cover[kind], sx, sy)
-    sx, sy = sx[keep], sy[keep]
+    sx, sy, untagged = sx[keep], sy[keep], untagged[keep]
     keep = ~(_near(road_tree, road_half + SHRUB_ROAD_CLEAR, sx, sy)
              | _near(building_tree, building_clear, sx, sy))
-    sx, sy = sx[keep], sy[keep]
+    sx, sy, untagged = sx[keep], sy[keep], untagged[keep]
     oak = rng.random(len(sx)) < MAQUIS_OAK_SHARE
     kind = np.where(oak, 0, 3)
+    shrub_h = SHRUB_H if maquis is None else maquis["h"]
+    spread = (1.3, 1.9) if maquis is None else maquis["spread"]
     h = np.where(oak, rng.uniform(*MAQUIS_OAK_H, len(sx)),
-                 rng.uniform(*SHRUB_H, len(sx)))
+                 rng.uniform(*shrub_h, len(sx)))
     w = h * np.where(oak, rng.uniform(0.8, 1.2, len(sx)),
-                     rng.uniform(1.3, 1.9, len(sx)))
+                     rng.uniform(*spread, len(sx)))
     tint = rng.uniform(0.82, 1.12, (len(sx), 3))
     tint[:, 2] *= 0.9
     trees.x = np.concatenate([trees.x, sx])
@@ -287,6 +308,7 @@ def _add_maquis(trees, cover, half, road_tree, road_half, building_tree,
                                   rng.uniform(0.0, 2 * np.pi, len(sx))])
     trees.tint = np.concatenate([trees.tint, tint])
     stats["shrub"] = int(np.count_nonzero(~oak))
+    stats["maquis_untagged"] = int(np.count_nonzero(untagged))
     stats["maquis_oak"] = int(np.count_nonzero(oak))
 
 
@@ -335,3 +357,4 @@ def emit_trees(trees, tiles, tile_m, out):
 # - revised 2026-10-23 (rectangular playable area)
 # - revised 2026-10-25 (narrow clearing along tracks)
 # - revised 2026-10-27 (mediterranean-dry takes the mediterranean kinds)
+# - revised 2026-11-04 (Corsican maquis on untagged land, MAQUIS)
