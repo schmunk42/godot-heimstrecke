@@ -11,6 +11,9 @@ plain `highway=service` ways (no `service=*` subtype, so no car park
 aisle or driveway) that share a node with such a track and with another
 kept road: in OSM a forest track often meets the road only through a
 short service way. Without --tracks no track and no service way is kept.
+
+Railway ways (`railway` in RAIL_KINDS) are kept apart as `rails`, for
+rails.py; they never join the road network.
 """
 import argparse
 import pickle
@@ -37,6 +40,9 @@ ROAD_TAGS = ("highway", "tracktype", "surface", "lanes", "width", "bridge",
              "destination:ref:backward", "destination:ref:to",
              "destination:ref:to:forward", "destination:ref:to:backward",
              "destination:lanes", "destination:ref:lanes")
+RAIL_KINDS = ("rail", "light_rail", "tram", "narrow_gauge", "subway")
+RAIL_TAGS = ("railway", "service", "gauge", "tunnel", "covered", "bridge",
+             "layer", "name")
 AREA_KEYS = ("building", "landuse", "natural", "leisure", "water",
              "waterway", "amenity")
 BUILDING_TAGS = ("building", "building:levels", "height", "roof:shape")
@@ -147,7 +153,7 @@ def main():
         return False
 
     roads, areas, trees, tree_rows, coastlines = [], [], [], [], []
-    places, town_signs = [], []
+    places, town_signs, rails = [], [], []
     near = box.buffer(PLACE_PAD_DEG)
     started = time.time()
     fp = (osmium.FileProcessor(args.pbf)
@@ -155,7 +161,8 @@ def main():
           .with_filter(osmium.filter.EntityFilter(
               osmium.osm.NODE | osmium.osm.WAY | osmium.osm.AREA))
           .with_filter(osmium.filter.KeyFilter(
-              "highway", "place", "traffic_sign", *AREA_KEYS)))
+              "highway", "place", "traffic_sign", "railway",
+              *AREA_KEYS)))
 
     for obj in fp:
         if obj.is_node():
@@ -205,6 +212,17 @@ def main():
             if line.intersects(box.buffer(COAST_PAD_DEG)):
                 coastlines.append({"id": obj.id, "geom": line.wkb})
             continue
+        if obj.is_way() and obj.tags.get("railway") in RAIL_KINDS:
+            if in_box(obj.nodes):
+                try:
+                    line = shapely.from_wkb(wkb.create_linestring(obj))
+                except osmium.InvalidLocationError:
+                    continue
+                tags = {k: obj.tags[k] for k in RAIL_TAGS if k in obj.tags}
+                rails.append({"id": obj.id, "tags": tags, "geom": line.wkb})
+            # a few roads carry their tram tags on the road way itself
+            if "highway" not in obj.tags:
+                continue
         if obj.is_way():
             highway = obj.tags.get("highway")
             if highway == "track":
@@ -260,7 +278,8 @@ def main():
                      "road_tags": ROAD_TAGS, "roads": roads,
                      "areas": areas, "trees": trees,
                      "tree_rows": tree_rows, "coastlines": coastlines,
-                     "places": places, "town_signs": town_signs},
+                     "places": places, "town_signs": town_signs,
+                     "rails": rails},
                     fh)
 
     counts = {}
@@ -270,6 +289,7 @@ def main():
     print(f"roads={len(roads)} areas={counts} trees={len(trees)} "
           f"tree_rows={len(tree_rows)} coastlines={len(coastlines)} "
           f"places={len(places)} town_signs={len(town_signs)} "
+          f"rails={len(rails)} "
           f"from_relations={relations} "
           f"seconds={time.time() - started:.0f}")
 
@@ -283,3 +303,4 @@ if __name__ == "__main__":
 # - revised 2026-10-25 (town entry sign nodes)
 # - revised 2026-10-25 (tracks and the service ways linking them)
 # - revised 2026-10-27 (name variants of places)
+# - revised 2026-11-04 (railway ways as rails)

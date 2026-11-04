@@ -52,7 +52,9 @@ def mine(values, exclude, pi, count):
 class RoadArea:
     """Every ground strip segment quad and junction hull, in plan.
 
-    edge: edge index per polygon, -1 for junction hulls.
+    edge: edge index per polygon, -1 for junction hulls; seg: the
+    first sample of each strip quad (-1 for hulls), height: each hull's
+    surface height (NaN for quads).
     """
 
     def __init__(self, net):
@@ -62,15 +64,19 @@ class RoadArea:
         quads = shapely.polygons(np.stack(
             [net.left[k], net.left[k + 1], net.right[k + 1], net.right[k],
              net.left[k]], axis=1))
-        rings = [(node, ring) for node, ring, _ in net.junction_rings
+        rings = [(node, ring, h) for node, ring, h in net.junction_rings
                  if not net.node_struct[node] and len(ring) >= 3]
-        hulls = [shapely.Polygon(ring) for _, ring in rings]
+        hulls = [shapely.Polygon(ring) for _, ring, _ in rings]
         self.polys = valid(np.concatenate(
             [quads, np.array(hulls, dtype=object)]))
         self.edge = np.concatenate(
             [net.edge_of[k], np.full(len(hulls), -1)])
         self.node = np.concatenate(
-            [np.full(len(k), -1), [int(n) for n, _ in rings]]).astype(int)
+            [np.full(len(k), -1), [int(n) for n, _, _ in rings]]).astype(int)
+        self.seg = np.concatenate([k, np.full(len(hulls), -1)]).astype(int)
+        self.height = np.concatenate(
+            [np.full(len(k), np.nan), [float(h) for _, _, h in rings]])
+        self.net = net
         self.tree = shapely.STRtree(self.polys)
         self.junctions = shapely.STRtree(self.polys[self.edge < 0])
 
@@ -123,6 +129,28 @@ class RoadArea:
         out[pi] = True
         return out
 
+    def surface_height(self, x, y):
+        """Per point: the drawn ground road surface there, NaN off the
+        roads. A junction hull wins over a strip quad; where several
+        quads hold the point the highest surface is taken."""
+        pts = np.atleast_1d(shapely.points(np.asarray(x, dtype=float),
+                                           np.asarray(y, dtype=float)))
+        out = np.full(len(pts), np.nan)
+        pi, ti = self.tree.query(pts, predicate="intersects")
+        quad = self.seg[ti] >= 0
+        if quad.any():
+            net, k = self.net, self.seg[ti[quad]]
+            p = shapely.get_coordinates(pts[pi[quad]])
+            a = np.column_stack([net.sx[k], net.sy[k]])
+            ab = np.column_stack([net.sx[k + 1], net.sy[k + 1]]) - a
+            t = np.clip(np.einsum("ij,ij->i", p - a, ab) / np.maximum(
+                np.einsum("ij,ij->i", ab, ab), 1e-12), 0.0, 1.0)
+            h = net.surface[k] + (net.surface[k + 1] - net.surface[k]) * t
+            np.fmax.at(out, pi[quad], h)
+        hull = ~quad
+        out[pi[hull]] = self.height[ti[hull]]
+        return out
+
     def gap(self, start, direction, own, reach):
         """Free run from each start point along direction (unit) to the
         nearest road other than edge own, capped at reach."""
@@ -138,3 +166,4 @@ class RoadArea:
                 shapely.intersection(rays[pi], self.polys[ti]))
             np.minimum.at(out, pi, np.nan_to_num(d, nan=reach))
         return out
+# - revised 2026-11-04 (surface_height: the road surface at a point)

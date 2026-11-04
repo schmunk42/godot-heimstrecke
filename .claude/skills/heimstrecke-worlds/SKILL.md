@@ -40,6 +40,7 @@ Full text: `docs/world-creation.md` (how a world is made, constants, known limit
 - Read widths from `net.half[s]` (per sample), not per-edge width; conform with the old width fails `terrain_below_roads` after the taper.
 - Terrain is a 10 m grid and `push_down` lowers every triangle corner under a road: terrain above the road is not possible with the 2 cm gate; the edge falls off with the 20° skirt only, no bank rises above it (removed 2026-10-25, it read as a raised kerb).
 - Conform has a keep rule: grid points nearer to a tunnel or deck segment than to a conformed road keep DGM1. Without it every portal gets a 15 to 40 m trench and every bridge start an embankment.
+- Railways (`rails.py`, 2026-11-04): the road wins. On a drawn ground road (`RoadArea.surface_height`) only the two rails are painted on the asphalt, elsewhere a ballast bed with rails; tunnels are left out, bridges get a straight grade. Keep them in their own `rails` layer without collision and out of conform, skirts and sidewalks, so gates and clipping counts stay identical (that is the check). Sample sparsely: a 2 m step grew the Stuttgart tiles by 54 %, 5 m with the OSM bends by 13 %.
 - Inland water is a surface in the `water` layer over a bed carved into the terrain mesh only (`water.py`, 2026-11-04: rivers were blue paint on slopes). Its level comes from the banks, never the raster inside the polygon, and the bed has a minimum depth with no cap, because terrain left near the surface flickers. Clip the polygons to the playable square (the raster ends beyond it; a sample outside stops the build). In `build_terrain` the local `water` is the colour mask; the parameter is `inland`.
 - Tunnels: cut the terrain only where it meets the cross-section (no lid, no masks); classes covered / slot / open by `COVER_MIN`; drop wall pieces that stand on another carriageway.
 - Bridges: find crossings by geometry; raise decks to `CLEAR_MIN` + `DECK_DEPTH`; `low` (creek) bridges are plain roads; transverse end walls and parapet ends must not stand on a carriageway (the smoke drive caught this).
@@ -94,3 +95,4 @@ After acting on feedback about a world (a bug report, a screenshot, a recording,
 <!-- - revised 2026-11-04 (Street View comparison, colours as shown) -->
 <!-- - revised 2026-11-04 (sidewalk segments yield to their own junction hull) -->
 <!-- - revised 2026-11-04 (traffic islands filled flat, /streetview) -->
+<!-- - revised 2026-11-04 (railways: the road wins) -->
