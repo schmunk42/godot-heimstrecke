@@ -14,6 +14,10 @@ const GAME := "Heimstrecke"
 const GAME_LICENCE := "Code: MIT License, Copyright (c) 2026 Tobias Munk. " \
 	+ "Source, pipeline and world recipes: " \
 	+ "https://github.com/schmunk42/godot-heimstrecke"
+const VOICE_CREDIT := "Co-driver voice: synthesised with Piper " \
+	+ "(https://github.com/OHF-Voice/piper1-gpl), voice en_US-norman-medium " \
+	+ "by Bryce Beattie, trained on public domain LibriVox recordings; " \
+	+ "the clips are under the MIT License of the game."
 
 var _text: RichTextLabel
 
@@ -59,7 +63,8 @@ func open(world: Dictionary) -> void:
 ## The whole credits text (BBCode) for the world manifest `world`.
 static func text_for(world: Dictionary) -> String:
 	var out := PackedStringArray()
-	out.append("[b]%s[/b]\n%s\n" % [GAME, _escape(GAME_LICENCE)])
+	out.append("[b]%s[/b]\n%s\n%s\n" % [GAME, _escape(GAME_LICENCE),
+		_escape(VOICE_CREDIT)])
 	out.append(_world_text(world))
 	out.append("[b]Godot Engine[/b]\nThis game uses Godot Engine, " \
 		+ "available under the following license:\n")
