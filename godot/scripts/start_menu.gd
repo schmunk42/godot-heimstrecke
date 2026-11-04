@@ -121,6 +121,12 @@ func setup(starts: Array, size_m: float, env: Environment,
 	car_title.text = "Choose a car"
 	car_title.add_theme_font_size_override("font_size", 30)
 	list.add_child(car_title)
+	# two columns, so eight cars take the height of four
+	var cars := GridContainer.new()
+	cars.columns = 2
+	cars.add_theme_constant_override("h_separation", 6)
+	cars.add_theme_constant_override("v_separation", 6)
+	list.add_child(cars)
 	var group := ButtonGroup.new()
 	for i in car_names.size():
 		var button := Button.new()
@@ -131,7 +137,8 @@ func setup(starts: Array, size_m: float, env: Environment,
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.add_theme_font_size_override("font_size", 18)
 		button.pressed.connect(_choose_car.bind(i))
-		list.add_child(button)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cars.add_child(button)
 		_car_buttons.append(button)
 	if not _routes.is_empty():
 		var route_title := Label.new()
@@ -368,3 +375,4 @@ func _key_name(index: int) -> String:
 # - revised 2026-10-25 (square map after the start list grew, refit on resize)
 # - revised 2026-10-26 (route choice, free drive, route on the map)
 # - revised 2026-10-26 (hint for G)
+# - revised 2026-11-04 (cars in two columns)

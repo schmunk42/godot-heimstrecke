@@ -3,12 +3,15 @@ extends RefCounted
 ## Procedural car bodies: lofted bodies with box wheel arches, a
 ## greenhouse (all dark glass, or in the paint with glass windows), trim,
 ## lights and wheels with tyre and rim; the only brand mark is the four
-## rings on the Audis. Three bodies (BODIES), chosen by the `body` key of
+## rings on the Audis. Seven bodies (BODIES), chosen by the `body` key of
 ## a cars.gd entry: the 1980s Audi quattro (Typ 85) with its upright nose
 ## and sloping rear window down to the tail, the Sport quattro with the
-## shorter wheelbase and the steeper windscreen, and the Lamborghini
+## shorter wheelbase and the steeper windscreen, the Lamborghini
 ## Huracán STO, a low wedge with an orange splitter and skirts, a roof
-## scoop, a fin and a rear wing.
+## scoop, a fin and a rear wing, the Subaru Impreza saloon with bonnet
+## scoop and boot wing, the boxy Golf II hatchback, the Ferrari F40 with
+## its full-width tail wing and the Porsche 911 GT3 RS with round
+## headlights on the wings and the swan-neck wing.
 ## Front is -Z, ground at y = 0.
 
 ## Body sections front to back, ground at y = 0: z, half width, sill
@@ -93,6 +96,91 @@ const STO_CANOPY := [
 	[1.30, 0.66, 0.92, 1.02],
 	[1.80, 0.74, 0.96, 0.99],
 ]
+## Subaru Impreza WRX STI (GD): a four-door saloon, front axle at
+## z = -1.2625, 4.42 m long, 1.74 m wide, a short boot deck behind the
+## rear window.
+const IMPREZA_BODY := [
+	[-2.23, 0.80, 0.28, 0.66],
+	[-2.17, 0.84, 0.24, 0.72],
+	[-1.70, 0.85, 0.24, 0.84],
+	[-0.80, 0.85, 0.25, 0.95],
+	[0.90, 0.85, 0.25, 0.97],
+	[1.70, 0.85, 0.26, 1.00],
+	[2.10, 0.83, 0.30, 1.01],
+	[2.19, 0.79, 0.38, 0.99],
+]
+## windscreen, roof at 1.42 m, rear window down to the boot lid
+const IMPREZA_CANOPY := [
+	[-0.82, 0.74, 0.90, 0.95],
+	[-0.10, 0.68, 0.91, 1.42],
+	[0.80, 0.67, 0.92, 1.42],
+	[1.45, 0.63, 0.94, 1.03],
+	[1.50, 0.62, 0.95, 1.00],
+]
+## Ferrari F40: front axle at z = -1.225, 4.36 m long, 1.97 m wide over
+## the rear arches, 1.12 m high; a low nose, the cockpit and the long
+## engine cover down to the tail wing.
+const F40_BODY := [
+	[-2.25, 0.80, 0.12, 0.30],
+	[-2.18, 0.88, 0.11, 0.42],
+	[-1.90, 0.92, 0.12, 0.56],
+	[-1.30, 0.93, 0.13, 0.68],
+	[-0.70, 0.93, 0.14, 0.74],
+	[0.10, 0.90, 0.14, 0.80],
+	[0.80, 0.96, 0.15, 0.86],
+	[1.60, 0.97, 0.18, 0.92],
+	[2.02, 0.95, 0.24, 0.96],
+	[2.11, 0.92, 0.30, 0.95],
+]
+const F40_CANOPY := [
+	[-1.00, 0.80, 0.70, 0.73],
+	[-0.30, 0.66, 0.74, 1.10],
+	[0.20, 0.62, 0.78, 1.124],
+	[0.60, 0.64, 0.82, 1.08],
+	[1.50, 0.74, 0.88, 0.94],
+	[1.90, 0.80, 0.92, 0.96],
+]
+## Porsche 911 GT3 RS (992): front axle at z = -1.2285, 4.57 m long,
+## 1.90 m wide, the engine behind the rear axle; a low bonnet between the
+## wings and the fastback roof down to the engine lid.
+const GT3RS_BODY := [
+	[-2.26, 0.80, 0.14, 0.46],
+	[-2.18, 0.87, 0.12, 0.56],
+	[-1.90, 0.89, 0.13, 0.66],
+	[-1.40, 0.90, 0.14, 0.72],
+	[-0.80, 0.89, 0.16, 0.76],
+	[0.40, 0.87, 0.18, 0.82],
+	[1.10, 0.94, 0.20, 0.88],
+	[1.80, 0.94, 0.22, 0.92],
+	[2.22, 0.91, 0.26, 0.94],
+	[2.31, 0.87, 0.34, 0.92],
+]
+const GT3RS_CANOPY := [
+	[-0.98, 0.74, 0.74, 0.77],
+	[-0.25, 0.66, 0.78, 1.30],
+	[0.35, 0.64, 0.82, 1.322],
+	[0.95, 0.66, 0.86, 1.20],
+	[1.55, 0.72, 0.90, 1.04],
+	[2.05, 0.78, 0.93, 0.95],
+]
+## VW Golf II GTI: front axle at z = -1.2375, 3.99 m long, 1.68 m wide, a
+## box with a steep tailgate.
+const GOLF_BODY := [
+	[-2.05, 0.78, 0.28, 0.74],
+	[-1.99, 0.81, 0.26, 0.78],
+	[-1.50, 0.82, 0.26, 0.86],
+	[-0.80, 0.82, 0.26, 0.93],
+	[1.20, 0.82, 0.27, 0.95],
+	[1.86, 0.81, 0.30, 0.96],
+	[1.94, 0.78, 0.36, 0.95],
+]
+const GOLF_CANOPY := [
+	[-0.84, 0.74, 0.90, 0.93],
+	[-0.20, 0.68, 0.91, 1.39],
+	[1.20, 0.67, 0.92, 1.405],
+	[1.80, 0.64, 0.93, 1.03],
+	[1.86, 0.63, 0.94, 0.98],
+]
 ## Windows of a greenhouse in the paint (the 1980s Audis): windscreen
 ## and rear window as z ranges on the canopy top, each inside one canopy
 ## segment; side windows as outlines of z, y points on the canopy side,
@@ -110,6 +198,23 @@ const SPORT_WINDOWS := {
 		[[-0.48, 0.95], [-0.15, 1.28], [0.52, 1.28], [0.52, 0.95]],
 		[[0.60, 0.95], [0.60, 1.28], [0.86, 1.28], [1.22, 0.95]]],
 }
+const IMPREZA_WINDOWS := {
+	"front": [-0.78, -0.14], "rear": [0.84, 1.41],
+	"side": [
+		[[-0.62, 0.98], [-0.14, 1.36], [0.30, 1.36], [0.30, 0.98]],
+		[[0.38, 0.98], [0.38, 1.36], [0.80, 1.36], [1.25, 0.98]]],
+}
+const GT3RS_WINDOWS := {
+	"front": [-0.94, -0.29], "rear": [1.00, 1.50],
+	"side": [
+		[[-0.80, 0.86], [-0.28, 1.26], [0.50, 1.26], [0.95, 0.92]]],
+}
+const GOLF_WINDOWS := {
+	"front": [-0.80, -0.24], "rear": [1.24, 1.76],
+	"side": [
+		[[-0.66, 0.98], [-0.24, 1.35], [0.45, 1.35], [0.45, 0.98]],
+		[[0.53, 0.98], [0.53, 1.35], [1.10, 1.35], [1.40, 0.98]]],
+}
 ## body: sections, canopy, superellipse exponents of body and canopy
 ## (smaller is boxier), rim radius, windows (empty: all-glass canopy),
 ## arches: axle positions and half width over the flares (optional)
@@ -125,6 +230,22 @@ const BODIES := {
 	"sto": {"body": STO_BODY, "canopy": STO_CANOPY,
 		"shape": Vector2(0.15, 0.3), "canopy_shape": Vector2(0.2, 0.35),
 		"rim": 0.254, "windows": {}},
+	"impreza": {"body": IMPREZA_BODY, "canopy": IMPREZA_CANOPY,
+		"shape": Vector2(0.12, 0.2), "canopy_shape": Vector2(0.1, 0.15),
+		"rim": 0.216, "windows": IMPREZA_WINDOWS,
+		"arches": {"axles": [-1.2625, 1.2625], "flare": 0.87}},
+	"f40": {"body": F40_BODY, "canopy": F40_CANOPY,
+		"shape": Vector2(0.15, 0.3), "canopy_shape": Vector2(0.2, 0.35),
+		"rim": 0.216, "windows": {},
+		"arches": {"axles": [-1.225, 1.225], "flare": 0.985}},
+	"gt3rs": {"body": GT3RS_BODY, "canopy": GT3RS_CANOPY,
+		"shape": Vector2(0.2, 0.35), "canopy_shape": Vector2(0.25, 0.4),
+		"rim": 0.26, "windows": GT3RS_WINDOWS,
+		"arches": {"axles": [-1.2285, 1.2285], "flare": 0.95}},
+	"golf": {"body": GOLF_BODY, "canopy": GOLF_CANOPY,
+		"shape": Vector2(0.07, 0.14), "canopy_shape": Vector2(0.06, 0.1),
+		"rim": 0.178, "windows": GOLF_WINDOWS,
+		"arches": {"axles": [-1.2375, 1.2375], "flare": 0.84}},
 }
 ## glass offset outside the canopy, windscreen and rear window inset from
 ## its sides (the pillars), m
@@ -182,6 +303,14 @@ static func build(parent: Node3D, wheel_parent: Node3D,
 			_sport_details(parent, trim)
 		"sto":
 			_sto_details(parent, paint, trim)
+		"impreza":
+			_impreza_details(parent, paint, trim)
+		"f40":
+			_f40_details(parent, paint, trim)
+		"gt3rs":
+			_gt3rs_details(parent, trim)
+		"golf":
+			_golf_details(parent, trim)
 
 	var wheels: Array[MeshInstance3D] = []
 	var tyre := StandardMaterial3D.new()
@@ -321,6 +450,104 @@ static func _sto_details(parent: Node3D, paint: Material,
 	_light(parent, Vector3(1.50, 0.04, 0.04), Vector3(0.0, 0.86, 2.21),
 		TAIL_LIGHT, 3.0)
 	_box(parent, Vector3(1.60, 0.20, 0.30), Vector3(0.0, 0.24, 2.10), trim)
+
+
+## Impreza: slim headlights at the corners of the nose, the black
+## grille and a wide intake below, the bonnet scoop in the paint, round
+## tail lights and the tall wing on the boot lid.
+static func _impreza_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	var z := -2.24
+	_box(parent, Vector3(0.50, 0.10, 0.04), Vector3(0.0, 0.58, z), trim)
+	_box(parent, Vector3(1.10, 0.14, 0.04), Vector3(0.0, 0.38, z), trim)
+	_box(parent, Vector3(0.46, 0.07, 0.36), Vector3(0.0, 0.92, -1.25),
+		paint, Vector3(0.06, 0.0, 0.0))
+	_box(parent, Vector3(0.36, 0.04, 0.04), Vector3(0.0, 0.93, -1.44), trim)
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.30, 0.10, 0.04),
+			Vector3(side * 0.56, 0.58, z - 0.01), HEADLIGHT, 4.0,
+			Vector3(0.0, side * 0.2, 0.0))
+		_light(parent, Vector3(0.20, 0.14, 0.04),
+			Vector3(side * 0.60, 0.86, 2.20), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.04, 0.16, 0.10),
+			Vector3(side * 0.55, 1.08, 1.95), trim)
+		_box(parent, Vector3(0.02, 0.05, 1.30),
+			Vector3(side * 0.845, 0.28, 0.0), trim)
+	_box(parent, Vector3(1.40, 0.03, 0.26), Vector3(0.0, 1.17, 1.97), paint,
+		Vector3(0.10, 0.0, 0.0))
+	_box(parent, Vector3(1.50, 0.06, 0.06), Vector3(0.0, 0.40, 2.20), trim)
+
+
+## F40: a black slot across the nose with the lights in it, three NACA
+## ducts in the bonnet, intakes behind the doors, the full-width wing on
+## the tail with side plates in the paint, four round tail lights and the
+## black mesh below them.
+static func _f40_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	_box(parent, Vector3(1.50, 0.08, 0.05), Vector3(0.0, 0.34, -2.24), trim)
+	_box(parent, Vector3(1.40, 0.10, 0.05), Vector3(0.0, 0.18, -2.22), trim)
+	for x in [-0.30, 0.0, 0.30]:
+		_box(parent, Vector3(0.12, 0.02, 0.40), Vector3(x, 0.62, -1.55),
+			trim, Vector3(0.12, 0.0, 0.0))
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.30, 0.05, 0.04),
+			Vector3(side * 0.55, 0.34, -2.27), HEADLIGHT, 4.0)
+		_box(parent, Vector3(0.04, 0.22, 0.50),
+			Vector3(side * 0.94, 0.60, 0.80), trim)
+		_box(parent, Vector3(0.04, 0.26, 0.40),
+			Vector3(side * 0.92, 1.05, 2.00), paint)
+		for x in [0.38, 0.62]:
+			_light(parent, Vector3(0.14, 0.14, 0.04),
+				Vector3(side * x, 0.80, 2.12), TAIL_LIGHT, 1.5)
+	_box(parent, Vector3(1.88, 0.04, 0.34), Vector3(0.0, 1.16, 2.00),
+		paint, Vector3(-0.08, 0.0, 0.0))
+	_box(parent, Vector3(1.50, 0.22, 0.05), Vector3(0.0, 0.50, 2.12), trim)
+
+
+## 911 GT3 RS: round headlights on the front wings, the black intakes
+## across the nose, vents in the bonnet, the swan-neck wing above the
+## engine lid, the light strip across the tail and the diffuser.
+static func _gt3rs_details(parent: Node3D, trim: Material) -> void:
+	_box(parent, Vector3(1.60, 0.16, 0.05), Vector3(0.0, 0.28, -2.26), trim)
+	_box(parent, Vector3(1.70, 0.03, 0.20), Vector3(0.0, 0.13, -2.20), trim)
+	_box(parent, Vector3(0.80, 0.02, 0.30), Vector3(0.0, 0.73, -1.40), trim,
+		Vector3(0.10, 0.0, 0.0))
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.20, 0.10, 0.06),
+			Vector3(side * 0.62, 0.58, -2.00), HEADLIGHT, 4.0,
+			Vector3(0.5, 0.0, 0.0))
+		_box(parent, Vector3(0.03, 0.42, 0.10),
+			Vector3(side * 0.30, 1.16, 1.95), trim)
+		_box(parent, Vector3(0.03, 0.18, 0.40),
+			Vector3(side * 0.86, 1.36, 1.98), trim)
+	_box(parent, Vector3(1.72, 0.035, 0.38), Vector3(0.0, 1.38, 1.98), trim,
+		Vector3(-0.10, 0.0, 0.0))
+	_light(parent, Vector3(1.60, 0.04, 0.04), Vector3(0.0, 0.90, 2.32),
+		TAIL_LIGHT, 3.0)
+	_box(parent, Vector3(1.50, 0.18, 0.25), Vector3(0.0, 0.26, 2.20), trim)
+
+
+## Golf II GTI: black grille across the nose with the red line and two
+## round headlights per side, black bumpers and side strips, square tail
+## lights.
+static func _golf_details(parent: Node3D, trim: Material) -> void:
+	var z := -2.06
+	var red := StandardMaterial3D.new()
+	red.albedo_color = Color(0.8, 0.04, 0.04)
+	_box(parent, Vector3(1.30, 0.16, 0.04), Vector3(0.0, 0.64, z), trim)
+	_box(parent, Vector3(0.70, 0.015, 0.04), Vector3(0.0, 0.71, z - 0.01),
+		red)
+	_box(parent, Vector3(1.66, 0.14, 0.10), Vector3(0.0, 0.40, z + 0.02),
+		trim)
+	_box(parent, Vector3(1.66, 0.14, 0.10), Vector3(0.0, 0.42, 1.93), trim)
+	for side in [-1.0, 1.0]:
+		for x in [0.44, 0.62]:
+			_light(parent, Vector3(0.15, 0.13, 0.04),
+				Vector3(side * x, 0.64, z - 0.01), HEADLIGHT, 4.0)
+		_light(parent, Vector3(0.30, 0.16, 0.04),
+			Vector3(side * 0.58, 0.80, 1.95), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.02, 0.06, 1.30),
+			Vector3(side * 0.825, 0.40, 0.0), trim)
 
 
 ## The sections resampled every ARCH_STEP with round wheel openings: the
@@ -478,3 +705,4 @@ static func _add(parent: Node3D, mesh: Mesh, at: Vector3) -> MeshInstance3D:
 	node.position = at
 	parent.add_child(node)
 	return node
+# - revised 2026-11-04 (Impreza, F40, 911 GT3 RS and Golf GTI bodies)
