@@ -35,6 +35,9 @@ const VIEWS := {
 		Vector3(10.0, 1.0, 0.0)],
 	"pace-signs": [Vector3(0.0, 1.5, 16.0), Vector3(0.0, 1.4, 0.0)],
 	"road-signs": [Vector3(0.0, 1.5, 14.0), Vector3(0.0, 1.4, 0.0)],
+	# the same signs from behind: grey back, no colour
+	"pace-signs-back": [Vector3(4.0, 1.5, -16.0), Vector3(0.0, 1.4, 0.0)],
+	"road-signs-back": [Vector3(4.0, 1.5, -14.0), Vector3(0.0, 1.4, 0.0)],
 }
 
 var _done := false
@@ -83,19 +86,23 @@ func _start() -> void:
 	stage.add_child(camera)
 	camera.make_current()
 
+	var pace_signs := [["5", _pace.bind("pace", ["5", "@curve_right"])],
+		["3", _pace.bind("pace_sharp", ["3", "@curve_left"])],
+		["H", _pace.bind("pace_tight", ["H", "@curve_right"])],
+		["4 into 2", _pace.bind("pace_sharp", ["4", "@curve_left",
+			"2", "@curve_right"])]]
+	var road_signs := [["federal", _road_sign.bind("federal", 0)],
+		["local", _road_sign.bind("local", 1)],
+		["motorway", _road_sign.bind("motorway", 1)],
+		["town", _road_sign.bind("town", 2)]]
 	var sheets := {
 		"junction-fence": [["", _junction.bind(0)]],
 		"junction-boards": [["", _junction.bind(1)]],
 		"junction-approach": [["", _junction.bind(0)]],
-		"pace-signs": [["5", _pace.bind("pace", ["5", "@curve_right"])],
-			["3", _pace.bind("pace_sharp", ["3", "@curve_left"])],
-			["H", _pace.bind("pace_tight", ["H", "@curve_right"])],
-			["4 into 2", _pace.bind("pace_sharp", ["4", "@curve_left",
-				"2", "@curve_right"])]],
-		"road-signs": [["federal", _road_sign.bind("federal", 0)],
-			["local", _road_sign.bind("local", 1)],
-			["motorway", _road_sign.bind("motorway", 1)],
-			["town", _road_sign.bind("town", 2)]],
+		"pace-signs": pace_signs,
+		"road-signs": road_signs,
+		"pace-signs-back": pace_signs,
+		"road-signs-back": road_signs,
 	}
 	var count := 0
 	for sheet: String in sheets:
@@ -244,3 +251,4 @@ func _on_watchdog() -> void:
 	if not _done:
 		_fail("watchdog after %d s" % WATCHDOG_S)
 # - revised 2026-11-04 (the chosen looks from the game code, a junction)
+# - revised 2026-11-04 (sign sheets from behind)
