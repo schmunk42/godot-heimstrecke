@@ -17,8 +17,8 @@ extends Node
 ## res://audio/codriver/ and read from the file, so it needs no import
 ## (the game's clips have the importer "keep", made by
 ## tools/codriver_voice.py). A word without a clip is skipped (and
-## reported once). The clips play on the bus "CoDriver", a radio:
-## band-pass 400 to 3200 Hz and a little distortion.
+## reported once). The clips play VOLUME_DB louder on the bus "CoDriver",
+## a radio: band-pass 400 to 3200 Hz and a little distortion.
 
 const PACE_NOTES := preload("res://scripts/pace_notes.gd")
 const LEAD_S := 6.0
@@ -27,6 +27,9 @@ const MAX_LEAD_M := 500.0
 ## a change of the place along the route bigger than this is a jump
 const RESYNC_M := 100.0
 const BUS := "CoDriver"
+## the clips peak at -1 dBFS, the radio's band-pass takes much of that
+## away and the engine is loud
+const VOLUME_DB := 6.0
 const DIRS := ["user://codriver", "res://audio/codriver"]
 const EXTENSIONS := ["wav", "ogg"]
 ## the most words one clip says ("into_3_left")
@@ -116,6 +119,7 @@ func setup(marks: Node3D, car: RigidBody3D) -> void:
 func _ready() -> void:
 	_add_bus()
 	_player.bus = BUS
+	_player.volume_db = VOLUME_DB
 	_player.finished.connect(_play_next)
 	add_child(_player)
 
