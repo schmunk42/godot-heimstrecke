@@ -1,0 +1,65 @@
+# file generated with AI assistance: Claude Code - 2026-11-04 17:40:00 UTC
+# Desktop binaries for Linux, Windows and macOS. A SemVer tag (0.1.0, no
+# "v") builds them and publishes a GitHub release; a manual run only
+# uploads them as workflow artifacts, as does a pull request that touches
+# the export. The build is `make export-image
+# export`, the same as on a host, so the Godot version stays in the
+# Makefile.
+name: release
+
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - export/**
+      - godot/export_presets.cfg
+      - Makefile
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # a tag that differs from config/version would ship binaries that
+      # report another version
+      - name: Check tag against project.godot
+        if: github.ref_type == 'tag'
+        run: |
+          version="$(sed -n 's/^config\/version="\(.*\)"$/\1/p' \
+            godot/project.godot)"
+          [ "$version" = "$GITHUB_REF_NAME" ] || {
+            echo "::error::tag $GITHUB_REF_NAME, project.godot $version"
+            exit 1
+          }
+
+      - name: Export
+        run: make export-image export
+
+      - name: Package
+        run: |
+          name="heimstrecke-${GITHUB_REF_NAME//\//-}"
+          mkdir dist
+          tar -czf "dist/$name-linux-x86_64.tar.gz" -C build/Linux .
+          (cd build/Windows && zip -qr "../../dist/$name-windows-x86_64.zip" .)
+          cp build/macOS/heimstrecke.zip "dist/$name-macos-universal.zip"
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: heimstrecke
+          path: dist/
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "Heimstrecke $GITHUB_REF_NAME" --generate-notes
