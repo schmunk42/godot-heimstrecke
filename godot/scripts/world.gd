@@ -663,7 +663,8 @@ func _jump_to(index: int) -> void:
 
 
 ## Adds a world scene with the vertex colour material; with `collide`
-## every mesh but the markings and the water gets trimesh collision. The
+## every mesh but the markings, the rails and the water gets trimesh
+## collision. The
 ## water surface (pipeline/water.py) takes _water: smooth, so it shines,
 ## and opaque (the bed lies below it). Skips a null scene (the loader has
 ## reported it).
@@ -675,7 +676,7 @@ func _add_scene(scene: Node, collide: bool) -> void:
 			mesh.material_override = _water
 			continue
 		mesh.material_override = _material
-		if collide and mesh.name != "markings":
+		if collide and mesh.name != "markings" and mesh.name != "rails":
 			mesh.create_trimesh_collision()
 			if mesh.name.contains("buildings"):
 				var body: StaticBody3D = mesh.get_child(-1)

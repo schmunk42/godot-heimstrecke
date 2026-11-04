@@ -42,6 +42,7 @@ from sea import SHORE_M, coastlines, horizon_water, sea_polygon
 from water import Water
 from signs import country_of, write_signs
 from markings import emit_markings
+from rails import emit_rails
 from sidewalks import assign as assign_sidewalks, emit_sidewalks
 from skirts import emit_skirts
 from starts import StartError, build_starts
@@ -88,6 +89,8 @@ COLORS = {
     "sidewalk": (0.58, 0.58, 0.56),
     "kerb": (0.66, 0.66, 0.64),
     "marking": (0.86, 0.86, 0.82),
+    "ballast": (0.36, 0.34, 0.31),
+    "rail": (0.55, 0.55, 0.57),
     "route": (0.85, 0.15, 0.12),
     "horizon": (0.42, 0.52, 0.36),
 }
@@ -97,7 +100,7 @@ COVER_ORDER = ("urban", "farmland", "green", "scrub", "forest", "sand",
                "rock", "water")
 # mesh layers of a tile (glTF node names)
 LAYERS = ("terrain", "roads", "buildings", "tunnels", "bridges",
-          "markings", "verges", "water")
+          "markings", "verges", "water", "rails")
 
 
 class InputError(RuntimeError):
@@ -836,6 +839,8 @@ def main():
                                     COLORS["kerb"])
     skirt_stats = emit_skirts(tiles, net, ground, base, COLORS["bank"])
     marking_stats = emit_markings(tiles, net, COLORS["marking"])
+    rail_stats, rail_lines = emit_rails(tiles, ex, frame, net, ground, base,
+                                        (COLORS["ballast"], COLORS["rail"]))
     clipping = check_clipping(net, ground, base, tiles.half)
     tunnels.emit(tiles, "tunnels")
     decks = build_decks(net, layout, tiles, ground, base)
@@ -848,7 +853,7 @@ def main():
         tiles, buildings, ground, base, recipe.biome, cover["urban"],
         RoadsOver(net, layout))
     trees = build_trees(ex, frame, net, cover, buildings, ground, base,
-                        tiles, tunnels.cut, recipe.biome)
+                        tiles, tunnels.cut, recipe.biome, rail_lines)
     t_buildings = time.time()
     tile_files, total_bytes = export_tiles(tiles, args.out)
     tree_meta = emit_trees(trees, tiles, TILE, args.out)
@@ -905,6 +910,7 @@ def main():
                             ground=ground, route_stats=route_stats,
                             tunnels=tunnels.stats, bridges=bridge_stats,
                             skirts=skirt_stats, markings=marking_stats,
+                            rails=rail_stats,
                             sidewalks=sidewalk_stats, clipping=clipping,
                             clipping_baseline_path=recipe.path.parent
                             / CLIPPING_BASELINE)
@@ -977,3 +983,4 @@ if __name__ == "__main__":
 # - revised 2026-11-04 (inland water as a surface, water.py)
 # - revised 2026-11-04 (hipped mediterranean roofs, roof colour by hash,
 #   storeys by hash)
+# - revised 2026-11-04 (railways in the rails layer)

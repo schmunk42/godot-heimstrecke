@@ -13,8 +13,9 @@ and the pushed-down terrain beside it) or BUILDING_CLEAR of a building,
 mapped trees on the carriageway itself (OSM street trees often lie
 within the default road width) or in a building, all trees in water and
 in the tunnel portal cuts; along tracks (recipe `tracks`) the clearing
-is TRACK_CLEAR. Footways, other tracks and railways are not in the
-extract, forest trees may stand on them.
+is TRACK_CLEAR, along drawn railways (rails.py) every tree keeps
+RAIL_CLEAR from the track centre. Footways and other tracks are not in
+the extract, forest trees may stand on them.
 
 The kinds depend on the biome (biome.py). temperate: broad and conifer
 as above. mediterranean and mediterranean-dry: oak (holm oak), pine,
@@ -44,6 +45,7 @@ import shapely
 
 from biome import KINDS, MAQUIS, MEDITERRANEAN, ROCK_SLOPE
 from frame import xyz
+from rails import RAIL_CLEAR
 from roads import road_width
 from sidewalks import WIDTH as SIDEWALK
 
@@ -119,7 +121,7 @@ class Trees:
 
 
 def build_trees(ex, frame, net, cover, buildings, ground, base, tiles,
-                cut=None, biome="temperate"):
+                cut=None, biome="temperate", rails=()):
     rng = np.random.default_rng(SEED)
     med = biome in MEDITERRANEAN
     half = tiles.half
@@ -132,9 +134,14 @@ def build_trees(ex, frame, net, cover, buildings, ground, base, tiles,
     building_tree = shapely.STRtree(footprints)
     building_clear = np.full(len(footprints), BUILDING_CLEAR)
 
+    rail_zone = shapely.union_all(shapely.buffer(list(rails), RAIL_CLEAR)) \
+        if len(rails) else None
+    if rail_zone is not None:
+        shapely.prepare(rail_zone)
+
     def blocked(x, y):
         out = ~((np.abs(x) < hx) & (np.abs(y) < hy))
-        for g in (cover["water"], cut):
+        for g in (cover["water"], cut, rail_zone):
             if g is not None:
                 out |= shapely.contains_xy(g, x, y)
         return out
@@ -358,3 +365,4 @@ def emit_trees(trees, tiles, tile_m, out):
 # - revised 2026-10-25 (narrow clearing along tracks)
 # - revised 2026-10-27 (mediterranean-dry takes the mediterranean kinds)
 # - revised 2026-11-04 (Corsican maquis on untagged land, MAQUIS)
+# - revised 2026-11-04 (clearing along railways)

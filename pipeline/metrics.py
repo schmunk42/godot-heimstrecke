@@ -672,7 +672,7 @@ def clipping_baseline(path, center, size_km):
 def write_metrics(network, out_dir, run_info, dem, base, frame,
                   route_points, horizon_dem=None, ground=None,
                   route_stats=None, tunnels=None, bridges=None,
-                  skirts=None, markings=None, sidewalks=None,
+                  skirts=None, markings=None, rails=None, sidewalks=None,
                   clipping=None, clipping_baseline_path=None):
     """Compute the report from the network and the exported tiles;
     clipping_baseline_path is the world's clipping ratchet fixture."""
@@ -709,6 +709,7 @@ def write_metrics(network, out_dir, run_info, dem, base, frame,
         "skirts": skirts,
         "sidewalks": sidewalks,
         "markings": markings,
+        "rails": rails,
         "clipping": clipping,
         "road_vs_terrain": centre,
         "road_edge": edge,
@@ -973,6 +974,16 @@ def skirts_md(sk):
             if sk["worst"] else ""]
 
 
+def rails_md(rl):
+    if not rl:
+        return []
+    return ["## Railways\n",
+            f"{rl['ways']} ways, {rl['km']} km of track: {rl['km_bed']} km "
+            f"on a ballast bed, {rl['km_on_road']} km as rails on a road "
+            f"(the road wins), {rl['km_bridge']} km on bridges (straight "
+            "grade, no deck); layer `rails` (no collision). Not gated.\n"]
+
+
 def markings_md(mk):
     if not mk:
         return []
@@ -1173,6 +1184,7 @@ def markdown(r):
     md += sidewalks_md(r.get("sidewalks"))
     md += skirts_md(r.get("skirts"))
     md += markings_md(r.get("markings"))
+    md += rails_md(r.get("rails"))
     md += clipping_md(r.get("clipping"),
                       g["informational"].get("clipping"))
     rv, rd = r["road_vs_terrain"], r["road_edge"]
@@ -1223,3 +1235,4 @@ def markdown(r):
 # - revised 2026-10-23 (clipping baseline per world, next to the recipe)
 # - revised 2026-10-23 (rectangular playable area)
 # - revised 2026-10-25 (position of the worst terrain_below_roads points)
+# - revised 2026-11-04 (railway report)
