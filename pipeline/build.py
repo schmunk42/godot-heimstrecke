@@ -36,6 +36,8 @@ from conform import conform
 from extract import ROAD_TAGS
 from fetch import MARGIN_M
 from frame import Frame, xyz
+from islands import (LAYER as ISLANDS, emit_islands, find_islands,
+                     terrain_above)
 from metrics import CLIPPING_BASELINE, HARD_GATES, write_metrics
 from roads import ROAD_STEP, build_road_network, emit_network
 from sea import SHORE_M, coastlines, horizon_water, sea_polygon
@@ -87,6 +89,7 @@ COLORS = {
     "bank": (0.68, 0.66, 0.60),
     "sidewalk": (0.58, 0.58, 0.56),
     "kerb": (0.66, 0.66, 0.64),
+    "island": (0.47, 0.36, 0.31),
     "marking": (0.86, 0.86, 0.82),
     "route": (0.85, 0.15, 0.12),
     "horizon": (0.42, 0.52, 0.36),
@@ -97,7 +100,7 @@ COVER_ORDER = ("urban", "farmland", "green", "scrub", "forest", "sand",
                "rock", "water")
 # mesh layers of a tile (glTF node names)
 LAYERS = ("terrain", "roads", "buildings", "tunnels", "bridges",
-          "markings", "verges", "water")
+          "markings", "verges", "water", ISLANDS)
 
 
 class InputError(RuntimeError):
@@ -820,11 +823,16 @@ def main():
     road_km = float(net.length.sum()) / 1000
     raised = raise_decks(net)
     layout = classify(net, dem, base, tiles.half + DGM1_MARGIN)
+    inland = inland_water(ex, frame, tiles.half)
+    plates, island_stats = find_islands(
+        net, [g for g, _ in buildings] + ([inland] if inland else []),
+        tiles.half)
     t_roads = time.time()
-    ground = conform(net, dem, base, tiles.half, TERRAIN_STEP, layout)
+    ground = conform(net, dem, base, tiles.half, TERRAIN_STEP, layout,
+                     plates)
+    island_stats.update(terrain_above(plates, ground, base))
     tunnels = build_tunnels(net, ground, base, tiles)
-    water = Water(inland_water(ex, frame, tiles.half), ground, base,
-                  RoadsOver(net, layout))
+    water = Water(inland, ground, base, RoadsOver(net, layout))
     clipped, removed = build_terrain(tiles, cover, ground, base,
                                      tunnels.cut, colors_of, recipe.biome,
                                      water)
@@ -832,6 +840,7 @@ def main():
                          terrain_triangles_removed=removed)
     emit_network(tiles, net, (COLORS["road"], COLORS["road_major"],
                               COLORS["gravel"]))
+    emit_islands(tiles, plates, COLORS["island"])
     sidewalk_stats = emit_sidewalks(tiles, net, COLORS["sidewalk"],
                                     COLORS["kerb"])
     skirt_stats = emit_skirts(tiles, net, ground, base, COLORS["bank"])
@@ -934,6 +943,8 @@ def main():
     print("sea: " + " ".join(f"{k}={v}" for k, v in sea_stats.items()))
     print("water: " + " ".join(f"{k}={v}"
                                for k, v in water.stats.items()))
+    print("islands: " + " ".join(f"{k}={v}"
+                                 for k, v in island_stats.items()))
     print("signs: " + " ".join(f"{k}={v}" for k, v in sign_stats.items()))
     print(" ".join(f"{k}={gates[k]}" for k in HARD_GATES))
     for st in meta.get("starts", []):
@@ -977,3 +988,5 @@ if __name__ == "__main__":
 # - revised 2026-11-04 (inland water as a surface, water.py)
 # - revised 2026-11-04 (hipped mediterranean roofs, roof colour by hash,
 #   storeys by hash)
+
+# - revised 2026-11-04 (traffic islands filled flat, islands.py)

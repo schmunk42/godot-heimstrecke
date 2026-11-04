@@ -28,11 +28,13 @@ The push-down pass also keeps the terrain under the middle and outer
 line of every sidewalk (sidewalks.py) and under every ground junction
 surface: its points are the centre, the rim points and points between
 every pair of them, because the hull edges between two strip ends are
-not on any strip.
+not on any strip. It keeps the terrain under every island plate
+(islands.py) too.
 """
 import numpy as np
 import shapely
 
+from islands import plate_points
 from sidewalks import KERB, MARGIN, WIDTH
 
 FLAT = 15.0
@@ -367,11 +369,11 @@ def pin_lines(h, half, step, lines):
     return pin.reshape(rows, cols)
 
 
-def conform(net, dem, base, half, step, bridges=None):
+def conform(net, dem, base, half, step, bridges=None, islands=()):
     """Conformed grid (absolute heights) and a few numbers about it.
 
     bridges: a bridges.BridgeLayout (deck and low segments, abutments)
-    or None.
+    or None; islands: the plates of islands.find_islands.
     """
     hx, hy = np.broadcast_to(half, 2)
     nx = int(round(2 * hx / step)) + 1
@@ -436,7 +438,8 @@ def conform(net, dem, base, half, step, bridges=None):
     cpts, cgh = strip_crossings(a, b, ga, gb, hw, half, step)
     pts, gh = np.vstack([pts, cpts]), np.concatenate([gh, cgh])
     for extra, extra_gh in (sidewalk_points(net, k, PUSH_T),
-                            junction_points(net), corner_points(net)):
+                            junction_points(net), corner_points(net),
+                            plate_points(islands)):
         pts = np.vstack([pts, extra])
         gh = np.concatenate([gh, extra_gh + base])
     pushed = push_down(h, half, step, pts, gh, np.isfinite(pin))
@@ -463,3 +466,4 @@ def conform(net, dem, base, half, step, bridges=None):
     return terrain
 # - revised 2026-10-23 (rectangular grid: rows along y, columns along x)
 # - revised 2026-10-25 (push points where the strips cross the mesh lines)
+# - revised 2026-11-04 (terrain kept under the island plates)

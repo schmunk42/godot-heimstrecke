@@ -44,6 +44,7 @@ Full text: `docs/world-creation.md` (how a world is made, constants, known limit
 - Tunnels: cut the terrain only where it meets the cross-section (no lid, no masks); classes covered / slot / open by `COVER_MIN`; drop wall pieces that stand on another carriageway.
 - Bridges: find crossings by geometry; raise decks to `CLEAR_MIN` + `DECK_DEPTH`; `low` (creek) bridges are plain roads; transverse end walls and parapet ends must not stand on a carriageway (the smoke drive caught this).
 - Buildings under a deck or a raised road end 1 m below it (`RoadsOver` in `build.py`); only roads more than 2 m above the building's floor count, so footprints touching a street at their own level stay as they are; a footprint at least half under such roads is capped as a whole (`UNDER_SHARE`).
+- Holes in the ground road area at junctions (between links and carriageways) are filled flat at road height in the `islands` layer (`islands.py`, 2026-11-04): the 10 m terrain cannot follow a hole a few metres wide and showed as grass with skirts poking up. `MAX_AREA` 1000 m² keeps parks and squares between roads as terrain; the largest junction island at the Österreichischer Platz has 841 m². `MAX_RISE` 2.5 m keeps the holes beside ramps over lower roads open, and holes with a building or water in them are blocks. Plates outside the playable square see unconformed DGM1 and are skipped.
 - Clipping: skirts, sidewalks and corners **yield** to carriageways (`priority.py`); a sidewalk corner must ignore its own arms and its own node hull. A sidewalk *segment* yields to its own junction hulls too (2026-11-04, Pragsattel): the cut-back is capped at a third of the edge, so on a short stub at a fork the first segment lay wholly on the hull as a kerb on the asphalt; 504 Stuttgart segments, all at sharp forks. Equal-class strips overlapping (z-fight) are an open problem, not a regression.
 
 ## Gates, determinism, tests
@@ -92,3 +93,4 @@ After acting on feedback about a world (a bug report, a screenshot, a recording,
 <!-- - revised 2026-11-04 (Corsican maquis, Street View link) -->
 <!-- - revised 2026-11-04 (Street View comparison, colours as shown) -->
 <!-- - revised 2026-11-04 (sidewalk segments yield to their own junction hull) -->
+<!-- - revised 2026-11-04 (traffic islands filled flat, /streetview) -->

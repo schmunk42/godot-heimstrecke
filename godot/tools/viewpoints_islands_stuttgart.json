@@ -1,0 +1,15 @@
+{
+  "_comment": "file generated with AI assistance: Claude Code - 2026-11-04 18:30:00 UTC. Traffic islands at the Österreichischer Platz (B 27), filled flat by pipeline/islands.py: the # position of the feedback screenshot and an overview.",
+  "views": [
+    {
+      "name": "islands-b27-drive",
+      "position": [-1245.5, 10.9, 1535.4],
+      "look_at": [-1249.0, 8.3, 1554.9]
+    },
+    {
+      "name": "islands-b27-overview",
+      "position": [-1225.0, 55.0, 1505.0],
+      "look_at": [-1250.0, 8.0, 1565.0]
+    }
+  ]
+}
