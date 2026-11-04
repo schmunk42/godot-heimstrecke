@@ -29,7 +29,10 @@ const LAYER_BUILDINGS := 2
 const UPRIGHT_RADII := [0.0, 2.0, 4.0, 8.0]
 
 const LATERAL_GAIN := 0.55
-const HANDBRAKE_GRIP := 0.35
+## the handbrake locks the rear wheels: they slide with this share of the
+## tyre grip against their contact patch velocity, take no drive and
+## hold the car at a standstill
+const HANDBRAKE_GRIP := 0.7
 const ROLLING_RESISTANCE := 0.013
 const HOLD_SPEED := 1.5
 const STEER_MAX := deg_to_rad(32.0)
@@ -346,30 +349,38 @@ func _physics_process(delta: float) -> void:
 		var v_lat := v_point.dot(w_right)
 		var v_fwd := v_point.dot(w_fwd)
 
-		var grip: float = spec.mu
-		if handbrake and not front:
-			grip *= HANDBRAKE_GRIP
-		var f_lat := -v_lat * (mass / 4.0) / delta * LATERAL_GAIN
-		slip = maxf(slip, absf(v_lat))
-		var f_long := -clampf(v_fwd / 0.5, -1.0, 1.0) \
-			* ROLLING_RESISTANCE * wheel_load
-		# open differentials: each axle's share split evenly between its
-		# two wheels
-		f_long += drive * (front_drive if front else 1.0 - front_drive) / 2.0
-		var brake_share := 0.3 if front else 0.2
-		f_long -= signf(v_fwd) * braking * brake_share
-		if handbrake and not front:
-			f_long -= signf(v_fwd) * minf(absf(v_fwd) * 400.0, 3000.0)
-		if pedal == 0.0 and brake == 0.0 and absf(v_fwd) < HOLD_SPEED:
-			# static friction so the parked car does not creep downhill
-			f_long = -v_fwd * (mass / 4.0) / delta * LATERAL_GAIN
-
-		var tire := w_right * f_lat + w_fwd * f_long
-		var limit := grip * wheel_load
-		if tire.length() > limit:
-			tire = tire.normalized() * limit
+		var locked := handbrake and not front
+		var v_slip := w_right * v_lat + w_fwd * v_fwd
+		var tire: Vector3
+		if locked and v_slip.length() > HOLD_SPEED:
+			# a locked wheel slides: kinetic friction against the contact
+			# patch velocity, which is mostly along the wheel, so the rear
+			# barely holds sideways and swings out
+			tire = -v_slip.normalized() * spec.mu * HANDBRAKE_GRIP \
+				* wheel_load
+			slip = maxf(slip, v_slip.length())
+		else:
+			var f_lat := -v_lat * (mass / 4.0) / delta * LATERAL_GAIN
+			slip = maxf(slip, absf(v_lat))
+			var f_long := -clampf(v_fwd / 0.5, -1.0, 1.0) \
+				* ROLLING_RESISTANCE * wheel_load
+			# open differentials: each axle's share split evenly between
+			# its two wheels; a locked wheel takes none
+			if not locked:
+				f_long += drive \
+					* (front_drive if front else 1.0 - front_drive) / 2.0
+			var brake_share := 0.3 if front else 0.2
+			f_long -= signf(v_fwd) * braking * brake_share
+			if absf(v_fwd) < HOLD_SPEED and (locked
+					or pedal == 0.0 and brake == 0.0):
+				# static friction so the parked car does not creep downhill
+				f_long = -v_fwd * (mass / 4.0) / delta * LATERAL_GAIN
+			tire = w_right * f_lat + w_fwd * f_long
+			var limit: float = spec.mu * wheel_load
+			if tire.length() > limit:
+				tire = tire.normalized() * limit
 		apply_force(tire, offset)
-		_update_wheel(i, dist, front, v_fwd, delta)
+		_update_wheel(i, dist, front, 0.0 if locked else v_fwd, delta)
 
 	var v2 := linear_velocity.length_squared()
 	apply_central_force(-linear_velocity * sqrt(v2) * spec.drag)
@@ -393,3 +404,4 @@ func _axis(axis: JoyAxis) -> float:
 	return value if absf(value) > 0.12 else 0.0
 # - revised 2026-10-23 (F asks world.gd for the nearest road)
 # - revised 2026-10-23 (show_body for the driver view)
+# - revised 2026-11-04 (handbrake locks the rear wheels for hairpins)
