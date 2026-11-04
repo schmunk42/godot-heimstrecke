@@ -31,9 +31,12 @@ ending at a tunnel portal.
 The road has priority (priority.py): a sidewalk segment or corner lying
 more than YIELD_AREA m2 or YIELD_FRAC of its area on another road is
 left out, so no kerb stands on a road beside a sharp fork or a narrow
-median. A segment's own strip and the junction surfaces at its ends do
-not count, nor a corner's two arms and its junction surface: corners
-overlap those a little by their shape, which is the accepted look.
+median. A segment's own strip does not count, but the junction surfaces
+at its ends do: the cut-back usually clears them, and where it is capped
+(a third of a short stub at a fork) the first segment lay on the
+junction as a kerb on the asphalt (Pragsattel, 2026-11-04). A corner's
+two arms and its junction surface do not count: corners overlap those a
+little by their shape, which is the accepted look.
 net.walk_keep and the filtered net.corners tell the skirts what was
 drawn.
 """
@@ -251,8 +254,7 @@ def walk_keep(net, area):
             [edge[sel], edge[sel + 1], outer[sel + 1], outer[sel],
              edge[sel]], axis=1))
         e = net.edge_of[sel]
-        keep[sel, side] = area.keep(quads, e, YIELD_AREA, YIELD_FRAC,
-                                    np.column_stack([net.u[e], net.v[e]]))
+        keep[sel, side] = area.keep(quads, e, YIELD_AREA, YIELD_FRAC)
     last = net.start[1:] - 1
     keep[last] = keep[last - 1]
     return keep
@@ -342,3 +344,4 @@ def emit_corner(tiles, net, corner, color, kerb_color):
 # - revised 2026-10-22 (road priority: segments and corners yield)
 # - revised 2026-10-22 (tiles own their key lookup)
 # - revised 2026-10-25 (default sidewalks in town only)
+# - revised 2026-11-04 (segments yield to their own junction surfaces)
