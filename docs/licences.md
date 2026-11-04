@@ -10,7 +10,7 @@ Review of the licences of the map material and the software of Heimstrecke, stat
 - The `sources` and `attribution` strings of the recipes were not the wording the licences ask for; they are corrected since 2026-10-25, see [Decisions](#decisions).
 - Since 2026-10-25 the world selection has a credits screen with the data credits and links, the data licence and the Godot notices; the attribution also shows for five seconds after the start.
 - Whether the generated tiles are a Produced Work or a Derivative Database under the ODbL is not settled by any OSMF guideline. Decided on 2026-10-25: the world data is put under the ODbL as a whole, so a shared `.world` package is fine either way.
-- The repository bundles no fonts, textures or audio, so no third-party asset licence applies today. The project's own code is under the MIT License since 2026-10-25.
+- The repository bundles no fonts or textures. Since 2026-11-04 it bundles the co-driver's voice clips, synthesised with Piper from a voice trained on public domain recordings, see [Co-driver voice](#co-driver-voice). The project's own code is under the MIT License since 2026-10-25.
 
 ## Decisions
 
@@ -84,7 +84,15 @@ Transitive packages are MIT or BSD except certifi (MPL-2.0, file-level copyleft)
 
 **Godot** is MIT: the copyright notice and licence text must be included in distributed games, a link in the credits is described as acceptable ([godotengine.org/license](https://godotengine.org/license/)); the third-party components inside the engine are listed in Godot's `COPYRIGHT.txt`. Jolt Physics is MIT *(from memory)*. Godot offers `Engine.get_license_text()`, `Engine.get_license_info()` and `Engine.get_copyright_info()` for a credits screen *(from memory, check the 4.7 documentation)*. Godot 4.7.2 itself was not checked.
 
-**Bundled assets**: none. `godot/` holds scripts, scenes, JSON and configuration only; cars are procedural bodies and the engine sounds are synthesised in code (`car_audio.gd`); no fonts, textures, images or audio files, no `addons/`.
+**Bundled assets**: the co-driver's voice clips in `godot/audio/codriver/` (see below). Otherwise `godot/` holds scripts, scenes, JSON and configuration only; cars are procedural bodies and the engine sounds are synthesised in code (`car_audio.gd`); no fonts, textures or images, no `addons/`.
+
+## Co-driver voice
+
+Decided on 2026-11-04. The clips in `godot/audio/codriver/` (one Ogg Vorbis file per word or phrase of the pace notes) are made by `tools/codriver_voice.py` (`make voice`) with [Piper](https://github.com/OHF-Voice/piper1-gpl) and the voice `en_US-norman-medium` from [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices) at a fixed revision:
+
+- **Voice model**: the repository is MIT; the model card names the dataset as LibriVox recordings, public domain, and the training as "trained from scratch" by Bryce Beattie ([brycebeattie.com/files/tts](https://brycebeattie.com/files/tts/)). No other voice went into it, so the clips carry no dataset licence. The clips are put under the MIT License of the game; the credits screen names Piper, the voice and its maker.
+- **Piper** itself (piper-tts 1.8.0, GPL-3.0-or-later per its package metadata) is a tool run once on the developer's machine; it is neither committed nor shipped, and its licence does not reach the audio it makes.
+- **Voices not taken**: `en_US-joe-medium` sounded best and its own dataset is CC0, but its model card says it is fine-tuned from `en_US-lessac`, which is trained on the Blizzard 2013 Lessac data under a research licence granted only to the named licensee; `en_US-john-medium` is fine-tuned from a voice whose data is not stated. Both were left out for that reason. `en_GB-cori-high` (LibriVox, from scratch) would be clean as well.
 
 ## Open questions for legal review
 

@@ -1,9 +1,11 @@
 # file generated with AI assistance: Claude Code - 2026-10-27 17:20:00 UTC
 extends SceneTree
 ## Checks co_driver.gd without a world: when a call is due at a speed, a
-## passed curve is not called, curves linked into one are one call, the
-## words of the notes of a drawn route all have a clip name and the clip
-## loader reads a wav file. Exit code 1 on a failure.
+## passed curve is not called, curves linked into one are one call, a
+## grade and its direction (after a link too) are one phrase clip, the
+## words of the notes of a drawn route all have a clip name, every clip
+## name has its Ogg clip in res://audio/codriver/ and the clip loader
+## reads a wav file. Exit code 1 on a failure.
 ##
 ##   godot --headless --path godot --script res://tests/co_driver_test.gd
 
@@ -40,6 +42,15 @@ func _initialize() -> void:
 		PACE_NOTES.analyse(_route()).size() > 0, true)
 	var missing := _words_without_clip(clips)
 	_expect("every word has a clip name", missing, [])
+	_expect("every clip is in the game", _clips_missing(clips), [])
+	var has := func(name: String) -> bool: return name in clips
+	_expect("phrases", CO_DRIVER.clip_names(["4", "right", "into", "3",
+		"left", "open"], has), ["4_right", "into_3_left", "open"])
+	_expect("hairpin phrase and distance", CO_DRIVER.clip_names(
+		["hairpin", "left", "150"], has), ["hairpin_left", "150"])
+	_expect("words without a phrase", CO_DRIVER.clip_names(
+		["4", "right"], func(_name: String) -> bool: return false),
+		["4", "right"])
 
 	var path := "user://co_driver_test.wav"
 	_write_wav(path)
@@ -63,6 +74,19 @@ func _words_without_clip(clips: Array[String]) -> Array:
 		for word: String in note.words:
 			if word not in clips:
 				missing.append(word)
+	return missing
+
+
+## the clip names without a playable clip in res://audio/codriver/ (made
+## by tools/codriver_voice.py)
+func _clips_missing(clips: Array[String]) -> Array:
+	var missing := []
+	for word in clips:
+		var path := "res://audio/codriver/%s.ogg" % word
+		var stream := AudioStreamOggVorbis.load_from_file(path) \
+			if FileAccess.file_exists(path) else null
+		if stream == null or stream.get_length() <= 0.0:
+			missing.append(word)
 	return missing
 
 
