@@ -22,6 +22,11 @@ and olive, cypress, shrub for the garrigue), and whitewashed, cream and
 light ochre houses with flat roofs (no ROOF, so the roof takes the
 facade colour).
 
+The mediterranean biomes also shade their ground (ground_shade): darker
+on slopes (GROUND_SLOPE) and a gentle mottle by position (GROUND_MOTTLE),
+so the relief reads on the bare, pale ground; the darker mediterranean
+ground colours date from 2026-11-04, when Bavella looked flat.
+
 A biome only overrides colours; a cover kind without a colour in the
 palette is not painted (temperate has no rock or sand), so the same
 extract gives the temperate worlds byte-identical tiles.
@@ -36,9 +41,9 @@ MEDITERRANEAN = ("mediterranean", "mediterranean-dry")
 PALETTES = {
     "temperate": {"scrub": (0.45, 0.68, 0.33)},
     "mediterranean": {
-        "default": (0.70, 0.68, 0.40),
-        "green": (0.66, 0.66, 0.38),
-        "farmland": (0.76, 0.70, 0.42),
+        "default": (0.60, 0.57, 0.34),
+        "green": (0.56, 0.56, 0.32),
+        "farmland": (0.66, 0.60, 0.36),
         "scrub": (0.42, 0.48, 0.26),
         "forest": (0.30, 0.36, 0.20),
         "sand": (0.86, 0.80, 0.62),
@@ -62,6 +67,14 @@ PALETTES = {
 ROCK_FROM_M = {"mediterranean": (1150.0, 1550.0)}
 # ... and between these slopes (rise over run)
 ROCK_SLOPE = {"mediterranean": (0.75, 1.2)}
+
+# ground darkens by up to the share between these slopes (rise over run)
+GROUND_SLOPE = {"mediterranean": (0.15, 0.6, 0.22),
+                "mediterranean-dry": (0.15, 0.6, 0.18)}
+# ground brightness varies by +- this share, over wavelengths of these
+# metres (incommensurate, so no visible repeat)
+GROUND_MOTTLE = {"mediterranean": (0.07, (173.0, 61.0, 23.0)),
+                 "mediterranean-dry": (0.07, (173.0, 61.0, 23.0))}
 
 # facade colours: (share, from, to); the share picks by the centroid hash
 # (build.facade_color), the colour runs from `from` to `to` within it
@@ -93,6 +106,25 @@ def palette(colors, biome):
     return {**colors, **PALETTES[biome]}
 
 
+def ground_shade(biome, xs, ys, slope):
+    """Brightness factor per vertex (local metres, slope as rise over
+    run): darker on slopes, mottled by position; ones for a biome
+    without ground shading."""
+    if biome not in GROUND_SLOPE:
+        return np.ones(len(xs))
+    lo, hi, dark = GROUND_SLOPE[biome]
+    shade = 1.0 - dark * np.clip((slope - lo) / (hi - lo), 0.0, 1.0)
+    amp, waves = GROUND_MOTTLE[biome]
+    mottle = np.zeros(len(xs))
+    for k, w in enumerate(waves):
+        a = 2.0 * np.pi / w
+        # each wave turned by its own angle, so the mottle has no axis
+        c, s = np.cos(1.1 * k + 0.4), np.sin(1.1 * k + 0.4)
+        mottle += np.sin(a * (c * xs + s * ys)) \
+            * np.cos(a * 0.7 * (c * ys - s * xs))
+    return shade + amp * mottle / len(waves)
+
+
 def rock_share(biome, heights, slope):
     """0..1 per vertex: how much of the rock colour (absolute heights,
     slope as rise over run); zeros for a biome without rock."""
@@ -105,3 +137,4 @@ def rock_share(biome, heights, slope):
     return np.maximum(by_height, by_slope)
 # - revised 2026-10-23 (facades, roofs, single-storey houses)
 # - revised 2026-10-27 (mediterranean-dry)
+# - revised 2026-11-04 (darker mediterranean ground, slope shade, mottle)

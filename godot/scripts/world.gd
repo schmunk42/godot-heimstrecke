@@ -681,6 +681,12 @@ func _setup_environment() -> void:
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	# half the sky light on the shaded side, and ambient occlusion in
+	# hollows, at the road edges and under trees: with the full sky light
+	# and no occlusion the pale Corsican hills looked flat (2026-11-04).
+	# SSAO needs Forward+; the compatibility renderer ignores it.
+	env.ambient_light_energy = 0.5
+	env.ssao_enabled = true
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_density = 0.00012
@@ -715,3 +721,4 @@ func _setup_environment() -> void:
 # - revised 2026-10-26 (pace notes and curve signs in the route log line)
 # - revised 2026-10-26 (G toggles the route band)
 # - revised 2026-11-03 (sun shadows: shorter range, blend splits, bias)
+# - revised 2026-11-04 (half the ambient light, SSAO)

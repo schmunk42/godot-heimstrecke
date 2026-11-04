@@ -27,7 +27,7 @@ import shapely
 import trimesh
 
 from biome import (FACADES, GROUND_FLOOR_M, ISOLATED_M, ISOLATED_NEIGHBOURS,
-                   ROOF, palette, rock_share)
+                   ROOF, ground_shade, palette, rock_share)
 from bridges import (DECK_DEPTH, build_decks, bridge_report, classify,
                      deck_half, normals, raise_decks, segment_index)
 from clipping import check_clipping, write_viewpoints
@@ -300,8 +300,11 @@ def build_terrain(tiles, cover, dem, base, cut=None, colors_of=COLORS,
         if "rock" in colors_of:
             n = int(round(TILE / TERRAIN_STEP)) + 1
             gy, gx = np.gradient(hs.reshape(n, n), TERRAIN_STEP)
-            share = rock_share(biome, hs + base,
-                               np.hypot(gx, gy).ravel())[:, None]
+            slope = np.hypot(gx, gy).ravel()
+            shade = ground_shade(biome, xs, ys, slope)
+            shade[water] = 1.0
+            colors = colors * shade[:, None]
+            share = rock_share(biome, hs + base, slope)[:, None]
             share[water] = 0.0
             colors = colors * (1 - share) \
                 + np.asarray(colors_of["rock"]) * share
@@ -850,3 +853,4 @@ if __name__ == "__main__":
 # - revised 2026-10-25 (default sidewalks in town only)
 # - revised 2026-10-25 (buildings under decks and raised roads capped)
 # - revised 2026-10-25 (gravel colour for tracks)
+# - revised 2026-11-04 (ground shade of the mediterranean biomes)
