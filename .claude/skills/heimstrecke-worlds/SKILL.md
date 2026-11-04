@@ -61,6 +61,8 @@ Full text: `docs/world-creation.md` (how a world is made, constants, known limit
 - Tell the two flickers apart: z-fighting is two coplanar surfaces swapping (whole patches, also with a still camera); shadow shimmer is a fine dot or diagonal raster on lit faces and at shadow edges that moves on the slightest camera move. The 2026-11-03 report "textures flicker" was shadow shimmer, the buildings have no textures.
 - The sun is built in `world.gd` (`_setup_environment`): its shadow range follows the tree shadows (`trees.gd`, up to 450 m), currently 500 m with blend splits, `shadow_bias` 0.15, `shadow_normal_bias` 1.5 and an 8192 shadow map in `project.godot`. A longer range coarsens the near texels (1500 m shimmered); walls nearly parallel to the sun show acne when the biases drop.
 - The software render (`make render`) cannot confirm a GPU look fix: it runs without shadows and draws stipple with them. The user checks with `make drive`.
+- Fine stripes in a texture (the old chevron boards) shimmer on the GPU when the camera moves: draw such patterns as solid-colour geometry a little in front of their plate (`STRIPE_LIFT` in `route_marks.gd`). Red and white stands only across the road straight on where the route turns; every other arm gets hay bales (the user's choice, 2026-11-04), because red and white everywhere flickers and loses its meaning.
+- A new look for props (barriers, ads, signs) is offered before it goes into a world: `godot/tools/render_props.gd` renders the game code on a synthetic junction and sign rows in the render container (the `make render` docker flags with `--script res://tools/render_props.gd -- --out /work/out`); for a choice, add variants side by side with a code above each and let the user pick. It needs no world data and takes seconds.
 
 ## Host (workhorse, 4 vCPU, 7.6 GiB, shared)
 
@@ -80,3 +82,4 @@ After acting on feedback about a world (a bug report, a screenshot, a recording,
 <!-- - revised 2026-10-27 (GEDTM30, epsg, mediterranean-dry, signs outside DE/FR) -->
 <!-- - revised 2026-10-27 (signs in Cyprus) -->
 <!-- - revised 2026-11-03 (GPU look and shadow shimmer, worktree data/out, master, feedback loop) -->
+<!-- - revised 2026-11-04 (texture stripes shimmer, red and white only straight on, render_props for looks) -->

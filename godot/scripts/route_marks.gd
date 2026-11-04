@@ -1,9 +1,13 @@
 # file generated with AI assistance: Claude Code - 2026-10-26 16:13:04 UTC
 extends Node3D
 ## The chosen route in the world: red chevrons on the road, pointing the
-## way to drive, and a red and white chevron board across every road that
-## leaves the route (side roads, the arms of crossings, the road straight
-## on where the route turns), its chevrons pointing where the route goes.
+## way to drive, and a barrier across every road that leaves the route
+## (side roads, the arms of crossings, the road straight on where the
+## route turns). Only the road straight on where the route turns gets a
+## red and white chevron board, its chevrons pointing where the route
+## goes; every other arm gets two layers of square hay bales. Chevrons
+## are red geometry STRIPE_LIFT in front of the white board, not a
+## texture: fine texture stripes shimmer when the camera moves.
 ##
 ## The band follows the route points like a road marking: lifted above
 ## the markings (0.02 m) and bridge decks, a flat strip with mitred
@@ -17,16 +21,21 @@ extends Node3D
 ## height, so not a bridge over it) is an arm, if that end lies within
 ## ON_M or points at the route (TOWARD). The pipeline cuts the drawn road
 ## ends back at junctions (pipeline/roads.py cut_back, up to 8 m beyond
-## the half width), so the ends do not meet. The board stands on the arm
-## where it is CLEAR_M from the route, across it, facing the junction.
-## With a collision layer every board gets a box (drive mode).
+## the half width), so the ends do not meet. The barrier stands on the
+## arm where it is CLEAR_M from the route, across it, facing the
+## junction; an arm is straight on when it leaves within STRAIGHT_COS of
+## the way the route came in. Barriers of one junction are joined by arcs
+## of ads (ARC_STYLES, by turns): banners on a fence, or perimeter boards
+## leaning back on the ground; the brand shrinks to fit its panel. With
+## a collision layer every barrier and arc gets boxes (drive mode).
 ##
 ## Before every curve of the route's pace notes (pace_notes.gd) stand
 ## pace note signs, built by signs.gd, upright: the grade, 1 to 6 or H
-## for a hairpin, above a bent arrow the way the curve goes; white for
-## grades 4 to 6, yellow for 2 and 3, red for 1 and hairpin (SIGN_KINDS),
-## SIGN_SCALE times a signpost line. A curve linked "into" the next shows
-## both pairs on one sign, in driving order, coloured by the tighter.
+## for a hairpin, large above a bent arrow the way the curve goes; white
+## for grades 4 to 6, yellow for 2 and 3, red for 1 and hairpin
+## (SIGN_KINDS), SIGN_SCALE times the signs.gd pace panel. A curve linked
+## "into" the next shows both pairs side by side on one sign, in driving
+## order, coloured by the tighter.
 ## Every curve gets two signs, at SIGN_AHEAD_M before it, one after the
 ## other, both SIGN_SIDE_M from the route on the outside of the curve
 ## (left of a right curve, right of a left curve). A
@@ -71,11 +80,17 @@ const ROUTE_PROBE_M := 14.0
 ## no arc around more than this
 const ARC_MAX := 2.7
 const ARC_STEP_M := 2.0
-## the advertising band on top of the chevron band
-const AD_BOTTOM := 1.0
-const AD_H := 0.65
+## the arm straight on: its direction within ~35 degrees of the route's
+## before the junction
+const STRAIGHT_COS := 0.8
+## ads on the arcs, one per AD_W: [bottom, height, lean back (rad)];
+## "fence" banners hang between posts AD_POST_H high
+const ARC_STYLES := {"fence": [0.3, 0.9, 0.0], "boards": [0.05, 0.9, 0.25]}
+const AD_POST_H := 1.3
 const AD_W := 3.4
-const AD_PIXEL := 0.011
+const AD_PIXEL := 0.0152
+## a glyph of the 64 px font is about this much of its size wide
+const GLYPH_W := 0.6
 const AD_TEXT_M := 200.0
 ## fake brands (oil, tyres), text colour and background
 const ADS := [["ZEDRA OIL", Color(1, 1, 1), Color(0.0, 0.45, 0.2)],
@@ -92,6 +107,12 @@ const BOARD_PERIOD_M := 1.25
 const BOARD_SWEEP := 0.2
 const BOARD_INK := 0.45
 const BOARD_DEPTH := 0.08
+## the red chevrons stand this far in front of the white board
+const STRIPE_LIFT := 0.02
+## square bales across a side road (bottom row three, the row above two,
+## staggered)
+const BALE := Vector3(2.35, 0.9, 1.2)
+const STRAW := Color(0.66, 0.52, 0.25)
 const POST_W := 0.1
 const CELL_M := 25.0
 const TEX_SIZE := Vector2i(256, 64)
@@ -125,9 +146,13 @@ var _cells := {}
 ## the backs of boards and signs and their posts, one grey mesh
 var _backs := SurfaceTool.new()
 var _back_count := 0
-## ad band quads by ADS index, and the ads placed so far
+## ad quads by ADS index, and the ads placed so far
 var _ad_faces := {}
 var _ad_count := 0
+## arcs built so far; the next one takes ARC_STYLES by turns from here
+var arc_count := 0
+var _stripes := SurfaceTool.new()
+var _bales := SurfaceTool.new()
 
 
 ## Builds the band of `points` (route points [x, y, z]), the curve signs
@@ -292,7 +317,8 @@ func _add_boards(lines: Array[PackedVector3Array], layer: int) -> int:
 			if not dup:
 				cands.append({"at": at, "away": board[1],
 					"across": board[2], "node": board[3], "short":
-					length < SHORT_M})
+					length < SHORT_M, "straight": _straight_on(board[1],
+					board[3])})
 	# a short road next to another board is fenced in by the barrier
 	var kept: Array[Dictionary] = []
 	for c in cands:
@@ -303,28 +329,45 @@ func _add_boards(lines: Array[PackedVector3Array], layer: int) -> int:
 					covered = true
 		if not covered:
 			kept.append(c)
+	_stripes.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_bales.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var count := 0
 	for c in kept:
-		_add_board(faces, body, c.at, c.away, c.across)
+		if c.straight:
+			_add_board(faces, body, c.at, c.away, c.across)
+		else:
+			_add_bales(body, c.at, c.away, c.across)
 		count += 1
-	count += _add_arcs(kept, faces, body)
+	count += _add_arcs(kept, body)
 	if count == 0:
 		if body != null:
 			body.queue_free()
 		return 0
-	_commit(faces, _material(chevron_texture(BOARD_SWEEP, BOARD_INK,
-		WHITE), WHITE))
+	_commit(faces, _material(null, WHITE))
+	_commit(_stripes, _material(null, RED))
+	var straw := StandardMaterial3D.new()
+	straw.albedo_color = STRAW
+	straw.roughness = 0.95
+	_commit(_bales, straw)
 	for key: int in _ad_faces:
 		_commit(_ad_faces[key], _material(null, ADS[key][2]))
 	return count
+
+
+## Whether the arm leaving the route `away` at `end` (_nearest) goes on
+## the way the route came in: the road straight on where the route turns.
+func _straight_on(away: Vector3, end: Array) -> bool:
+	var along: float = _along[end[1]] + _flat(end[2] - _pts[end[1]]).length()
+	var d_in := _flat(end[2] - _place(along - ROUTE_PROBE_M)[0])
+	return d_in.length() > 0.1 \
+		and away.dot(d_in.normalized()) > STRAIGHT_COS
 
 
 ## Joins the boards of one junction into a barrier: between two boards
 ## next to each other around the junction a quarter circle (or what the
 ## angle gives) from the end of one to the end of the other, on the side
 ## away from the route. Returns the number of arcs.
-func _add_arcs(boards: Array[Dictionary], faces: SurfaceTool,
-		body: StaticBody3D) -> int:
+func _add_arcs(boards: Array[Dictionary], body: StaticBody3D) -> int:
 	var groups: Array = []
 	var seen := {}
 	for i in boards.size():
@@ -369,7 +412,7 @@ func _add_arcs(boards: Array[Dictionary], faces: SurfaceTool,
 					blocked = true
 			if blocked or span > ARC_MAX:
 				continue
-			arcs += _arc(a, b, centre, faces, body)
+			arcs += _arc(a, b, centre, body)
 	return arcs
 
 
@@ -377,10 +420,11 @@ func _angle(v: Vector3) -> float:
 	return fposmod(atan2(v.z, v.x), TAU)
 
 
-## The barrier from the counter-clockwise end of board `a` to the
-## clockwise end of board `b`, around `centre`.
+## The ads from the counter-clockwise end of barrier `a` to the
+## clockwise end of barrier `b`, around `centre`, one per AD_W along the
+## arc's chords, in the next of ARC_STYLES.
 func _arc(a: Dictionary, b: Dictionary, centre: Vector3,
-		faces: SurfaceTool, body: StaticBody3D) -> int:
+		body: StaticBody3D) -> int:
 	var ends := []
 	for pair in [[a, 1.0], [b, -1.0]]:
 		var board: Dictionary = pair[0]
@@ -408,53 +452,17 @@ func _arc(a: Dictionary, b: Dictionary, centre: Vector3,
 			* lerpf(r0, r1, t)
 		p.y = lerpf(start.y, finish.y, t)
 		pts.append(p)
-	# the chevrons point to where the route goes
-	var mid: Vector3 = pts[steps / 2]
-	var forward := _flat(pts[mini(steps / 2 + 1, steps)] - mid)
-	var ahead := _flat(_ahead(a.node[1], a.node[2]) - mid)
-	var reverse := forward.dot(ahead) < 0.0
-	var u := 0.0
+	var style: Array = ARC_STYLES.values()[arc_count % ARC_STYLES.size()]
+	var fence: bool = style[2] == 0.0
+	arc_count += 1
+	var total := 0.0
 	for k in steps:
-		var p: Vector3 = pts[k]
-		var q: Vector3 = pts[k + 1]
-		var d := _flat(q - p)
-		var len := d.length()
-		if len < 0.01:
-			continue
-		var along_dir := d / len
-		var radial := Vector3(along_dir.z, 0.0, -along_dir.x)
-		if radial.dot(_flat(p - centre)) < 0.0:
-			radial = -radial
-		var mid_p := (p + q) / 2.0
-		var u0 := u / BOARD_PERIOD_M
-		var u1 := (u + len) / BOARD_PERIOD_M
-		if reverse:
-			u0 = -u0
-			u1 = -u1
-		_panel(faces, mid_p, along_dir, radial, -len / 2.0, len / 2.0,
-			BOARD_BOTTOM, BOARD_BOTTOM + BOARD_H, u0, u1)
-		u += len
-		_post(mid_p + radial * BOARD_DEPTH * 2.0,
-			AD_BOTTOM + AD_H)
-		if body != null:
-			var shape := CollisionShape3D.new()
-			var box := BoxShape3D.new()
-			box.size = Vector3(len + 0.2, AD_BOTTOM + AD_H, 0.3)
-			shape.shape = box
-			shape.transform = Transform3D(
-				Basis(along_dir, Vector3.UP, radial), mid_p
-				+ Vector3.UP * (AD_BOTTOM + AD_H) / 2.0
-				+ radial * BOARD_DEPTH)
-			body.add_child(shape)
-	# ads along the arc, one per AD_W, on its chord pieces
-	var total := u
+		total += _flat(pts[k + 1] - pts[k]).length()
 	var pieces := maxi(1, floori(total / AD_W))
 	var piece := total / pieces
 	for m in pieces:
-		var s0 := piece * m
-		var s1 := s0 + piece
-		var p0 := _arc_point(pts, s0)
-		var p1 := _arc_point(pts, s1)
+		var p0 := _arc_point(pts, piece * m)
+		var p1 := _arc_point(pts, piece * (m + 1))
 		var d := _flat(p1 - p0)
 		if d.length() < 0.01:
 			continue
@@ -462,7 +470,20 @@ func _arc(a: Dictionary, b: Dictionary, centre: Vector3,
 		var radial := Vector3(dir.z, 0.0, -dir.x)
 		if radial.dot(_flat(p0 - centre)) < 0.0:
 			radial = -radial
-		_ad((p0 + p1) / 2.0, dir, radial, d.length())
+		var mid := (p0 + p1) / 2.0
+		_ad(mid, dir, radial, d.length() - 0.1, style)
+		if fence:
+			_post(p0 + radial * BOARD_DEPTH * 2.0, AD_POST_H)
+			if m == pieces - 1:
+				_post(p1 + radial * BOARD_DEPTH * 2.0, AD_POST_H)
+		if body != null:
+			var shape := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = Vector3(d.length(), AD_POST_H, 0.3)
+			shape.shape = box
+			shape.transform = Transform3D(Basis(dir, Vector3.UP, radial),
+				mid + Vector3.UP * AD_POST_H / 2.0 + radial * BOARD_DEPTH)
+			body.add_child(shape)
 	return 1
 
 
@@ -477,10 +498,12 @@ func _arc_point(pts: Array[Vector3], along: float) -> Vector3:
 	return pts[pts.size() - 1]
 
 
-## One ad on top of the chevron band: a coloured quad `width` wide
-## centred on `at`, along `right`, its back towards `behind`, with the
-## brand as a Label3D.
-func _ad(at: Vector3, right: Vector3, behind: Vector3, width: float) -> void:
+## One ad: a coloured panel `width` wide centred on `at`, along `right`,
+## its back towards `behind`, `style` ([bottom, height, lean], see
+## ARC_STYLES) giving its height and how far its top leans back; the
+## brand as a Label3D, shrunk to fit the panel.
+func _ad(at: Vector3, right: Vector3, behind: Vector3, width: float,
+		style: Array) -> void:
 	var ad: Array = ADS[_ad_count % ADS.size()]
 	var key := _ad_count % ADS.size()
 	_ad_count += 1
@@ -489,26 +512,31 @@ func _ad(at: Vector3, right: Vector3, behind: Vector3, width: float) -> void:
 		fresh.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_ad_faces[key] = fresh
 	var tool: SurfaceTool = _ad_faces[key]
-	var lo := Vector3.UP * AD_BOTTOM
-	var hi := Vector3.UP * (AD_BOTTOM + AD_H)
-	var quad := [at - right * width / 2.0 + lo, at + right * width / 2.0 + lo,
-		at + right * width / 2.0 + hi, at - right * width / 2.0 + hi]
+	var height: float = style[1]
+	var lean: float = style[2]
+	var up := Vector3.UP * cos(lean) + behind * sin(lean)
+	var front := (Vector3.UP * sin(lean) - behind * cos(lean)).normalized()
+	var lo := at + Vector3.UP * float(style[0])
+	var hi := lo + up * height
+	var half := right * width / 2.0
+	var quad := [lo - half, lo + half, hi + half, hi - half]
 	for k in [0, 1, 2, 0, 2, 3]:
 		tool.add_vertex(quad[k])
 	for k in [0, 2, 1, 0, 3, 2]:
-		_backs.add_vertex(quad[k] + behind * BOARD_DEPTH)
+		_backs.add_vertex(quad[k] - front * BOARD_DEPTH)
 	_back_count += 1
 	var label := Label3D.new()
 	label.text = ad[0]
 	label.font_size = 64
-	label.pixel_size = AD_PIXEL
+	label.pixel_size = minf(AD_PIXEL * height / 0.9,
+		width * 0.9 / (ad[0].length() * 64 * GLYPH_W))
 	label.modulate = ad[1]
 	label.outline_size = 0
 	label.shaded = false
 	label.double_sided = false
 	label.visibility_range_end = AD_TEXT_M
-	label.transform = Transform3D(Basis.looking_at(behind, Vector3.UP),
-		at + Vector3.UP * (AD_BOTTOM + AD_H / 2.0) - behind * 0.01)
+	label.transform = Transform3D(Basis(up.cross(front), up, front),
+		(lo + hi) / 2.0 + front * 0.01)
 	add_child(label)
 
 
@@ -613,28 +641,64 @@ func _ahead(index: int, at: Vector3) -> Vector3:
 	return _pts[i]
 
 
-## A board at `at` across the arm (`away` from the route), chevrons
-## pointing along `across`, its face towards the junction, on two posts.
+## A board at `at` across the arm (`away` from the route), red chevrons
+## as geometry STRIPE_LIFT in front of it pointing along `across`, its
+## face towards the junction, on two posts.
 func _add_board(faces: SurfaceTool, body: StaticBody3D, at: Vector3,
 		away: Vector3, across: Vector3) -> void:
-	var top := AD_BOTTOM + AD_H
+	var top := BOARD_BOTTOM + BOARD_H
 	_panel(faces, at, across, away, -BOARD_W / 2.0, BOARD_W / 2.0,
-		BOARD_BOTTOM, BOARD_BOTTOM + BOARD_H, 0.0,
-		BOARD_W / BOARD_PERIOD_M)
-	_ad(at, across, away, BOARD_W - 2.0 * POST_W)
+		BOARD_BOTTOM, top, 0.0, 0.0)
+	var n := ceili(BOARD_W / BOARD_PERIOD_M)
+	var period := BOARD_W / n
+	var sweep := BOARD_SWEEP * period
+	var ink := BOARD_INK * period
+	var front := at - away * STRIPE_LIFT
+	var mid := Vector3.UP * (BOARD_BOTTOM + BOARD_H / 2.0)
+	var h := Vector3.UP * BOARD_H / 2.0
+	for k in n:
+		# the tip, then its two ends `sweep` behind it, `ink` thick
+		var tip := front + mid + across * (-BOARD_W / 2.0
+			+ (k + 0.5) * period + (ink + sweep) / 2.0)
+		var back := -across * sweep
+		for arm: Vector3 in [h, -h]:
+			var q := [tip + back + arm, tip, tip - across * ink,
+				tip + back + arm - across * ink]
+			for i in [0, 1, 2, 0, 2, 3]:
+				_stripes.add_vertex(q[i])
 	var back := away * BOARD_DEPTH
-	var hi := Vector3.UP * top
 	for side in [-1.0, 1.0]:
 		_post(at + across * side * (BOARD_W / 2.0 - POST_W) + back * 2.0,
 			top)
+	_barrier_box(body, at + back, away, across, Vector3(BOARD_W, top, 0.3))
+
+
+## Two layers of square bales across the arm at `at`, their front face
+## there, towards the junction (`away` from the route).
+func _add_bales(body: StaticBody3D, at: Vector3, away: Vector3,
+		across: Vector3) -> void:
+	var depth := away * BALE.z / 2.0
+	for x in [-BALE.x, 0.0, BALE.x]:
+		_obox(_bales, at + across * x + depth + Vector3.UP * BALE.y / 2.0,
+			across, away, BALE)
+	for x in [-BALE.x / 2.0, BALE.x / 2.0]:
+		_obox(_bales, at + across * x + depth + Vector3.UP * BALE.y * 1.5,
+			across, away, BALE)
+	_barrier_box(body, at + depth, away, across,
+		Vector3(BOARD_W, BALE.y * 2.0, BALE.z))
+
+
+## A collision box of `size` (across, up, along `away`) standing at `at`.
+func _barrier_box(body: StaticBody3D, at: Vector3, away: Vector3,
+		across: Vector3, size: Vector3) -> void:
 	if body == null:
 		return
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(BOARD_W, hi.y, 0.3)
+	box.size = size
 	shape.shape = box
 	shape.transform = Transform3D(Basis(across, Vector3.UP, away),
-		at + hi / 2.0 + back)
+		at + Vector3.UP * size.y / 2.0)
 	body.add_child(shape)
 
 
@@ -725,6 +789,26 @@ func _box(tool: SurfaceTool, centre: Vector3, size: Vector3) -> void:
 				tool.add_vertex(corners[k])
 
 
+## A box of `size` around `centre`, x along `right`, z along `fwd`
+## (both horizontal), with normals and front faces outwards.
+func _obox(tool: SurfaceTool, centre: Vector3, right: Vector3,
+		fwd: Vector3, size: Vector3) -> void:
+	var axes := [right, Vector3.UP, fwd]
+	for axis in 3:
+		for sgn in [-1.0, 1.0]:
+			var n: Vector3 = axes[axis] * sgn
+			var a: Vector3 = axes[(axis + 1) % 3] * size[(axis + 1) % 3] / 2.0
+			var b: Vector3 = axes[(axis + 2) % 3] * size[(axis + 2) % 3] / 2.0
+			if a.cross(b).dot(n) < 0.0:
+				b = -b
+			var c := centre + n * size[axis] / 2.0
+			var corners := [c - a - b, c + a - b, c + a + b, c - a + b]
+			tool.set_normal(n)
+			# clockwise seen from outside, Godot's front face
+			for k in [0, 2, 1, 0, 3, 2]:
+				tool.add_vertex(corners[k])
+
+
 static func _near_any(points: Array[Vector3], at: Vector3,
 		radius: float) -> bool:
 	for q in points:
@@ -738,3 +822,4 @@ static func _flat(v: Vector3) -> Vector3:
 # - revised 2026-10-26 (curve signs from the pace notes)
 # - revised 2026-10-26 (pace note signs with grade, band hidden by default)
 # - revised 2026-10-26 (upright signs, two or three per curve, sides by turns)
+# - revised 2026-11-04 (chevron board only straight on, bales, ads on the arcs, geometry chevrons)

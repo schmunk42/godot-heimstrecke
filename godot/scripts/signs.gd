@@ -21,6 +21,15 @@ extends Node3D
 ## glyphs. A sign may carry `scale` (the whole sign, default 1) and
 ## `bottom` (panel bottom before scaling, default PANEL_BOTTOM): the pace
 ## note signs of route_marks.gd are larger and lower than a signpost.
+## Every panel but the town signs is framed: rounded corners and a
+## border in the text colour, FRAME_MARGIN inside the edge, so a thin rim
+## of the panel colour stays outside it; the text is centred on the
+## panel, an arrow sits left of it, and the padding is split above and
+## below the lines. `"style": "plain"` in the data draws the square
+## panels of before (tools/render_props.gd compares them).
+## Pace note signs (kinds starting with "pace") have their own layout:
+## per grade and curve pair a column PACE_W wide, the grade large at
+## PACE_GRADE_Y of the height above the bent arrow at PACE_CURVE_Y.
 
 const PANEL_BOTTOM := 2.2
 const LINE_H := 0.62
@@ -84,12 +93,25 @@ const CURVE_PREFIX := "@curve_"
 const CURVE_H := 1.1
 const CURVE_CHARS := 2
 const CURVE_STROKE := 0.17
+const FRAME_W := 0.05
+const FRAME_MARGIN := 0.025
+const FRAME_R := 0.1
+const FRAME_STEPS := 4
+## pace note panel: size per pair, grade and arrow centres (share of the
+## height), grade glyph size, arrow scale
+const PACE_W := 1.24
+const PACE_H := 2.07
+const PACE_GRADE_Y := 0.73
+const PACE_CURVE_Y := 0.28
+const PACE_PIXEL := 0.0155
+const PACE_CURVE_SCALE := 0.74
 
 var _materials := {}
 var _country := "de"
 var _post_mesh := CylinderMesh.new()
 var _arrow_mesh: ArrayMesh
 var _curve_mesh: ArrayMesh
+var _framed := false
 
 
 ## Adds every sign of `data` (the parsed signs.json); returns the count.
@@ -104,6 +126,7 @@ func load_signs(data: Dictionary) -> int:
 	_arrow_mesh = _make_arrow()
 	_curve_mesh = _make_curve()
 	_country = str(data.get("country", "de"))
+	_framed = str(data.get("style", "framed")) == "framed"
 	var count := 0
 	for sign: Dictionary in data.get("signs", []):
 		_add(sign)
@@ -134,8 +157,13 @@ func _add(sign: Dictionary) -> void:
 		bottom = TOWN_BOTTOM
 		if _country == "fr":
 			lines = lines.map(func(l: String) -> String: return l.to_upper())
-	var size := _panel(root, 0.0, bottom, lines, str(sign.get("ref", "")),
-		colours, 0.0, TEXT_M, sign.get("tones", []))
+	var size: Vector2
+	if str(sign.kind).begins_with("pace"):
+		size = _pace_panel(root, bottom, lines, colours)
+	else:
+		size = _panel(root, 0.0, bottom, lines, str(sign.get("ref", "")),
+			colours, 0.0, TEXT_M, sign.get("tones", []),
+			_framed and sign.kind != "town")
 	if sign.kind == "town":
 		_border(root, size, bottom, TOWN_STYLE.get(_country,
 			TOWN_STYLE["de"])[1])
@@ -170,7 +198,7 @@ func _add_gantry(root: Node3D, gantry: Dictionary, colours: Array) -> void:
 		var size := _panel(root, panel.offset, GANTRY_CLEAR, panel.lines,
 			str(panel.get("ref", "")), colours,
 			maxf(float(panel.span) - 0.3, 0.0), GANTRY_TEXT_M,
-			panel.get("tones", []))
+			panel.get("tones", []), _framed)
 		tallest = maxf(tallest, size.y)
 	var side: float = float(gantry.half) + GANTRY_SIDE
 	var top := GANTRY_CLEAR + tallest
@@ -204,7 +232,7 @@ func _post(root: Node3D, x: float, height: float, z: float,
 ## one; returns its size.
 func _panel(root: Node3D, x: float, bottom: float, source: Array,
 		ref: String, colours: Array, min_w: float, text_m: float,
-		tones: Array = []) -> Vector2:
+		tones: Array = [], frame := false) -> Vector2:
 	var lines: Array = source.duplicate()
 	var arrows: Array = []
 	var curves: Array = []
@@ -216,23 +244,40 @@ func _panel(root: Node3D, x: float, bottom: float, source: Array,
 			lines[i] = lines[i].substr(1).strip_edges()
 	if not ref.is_empty() and not lines.is_empty():
 		lines[0] = "%s  %s" % [ref, lines[0]]
+	var inset := FRAME_MARGIN + FRAME_W if frame else 0.0
 	var widest := 0
-	var h := PAD
+	# framed: half the padding above and below, so the lines sit in the
+	# middle (plain panels have all of it on top)
+	var h := (PAD / 2.0 if frame else PAD) + inset
 	var tops := []
 	for i in lines.size():
 		widest = maxi(widest, CURVE_CHARS if curves[i] else lines[i].length())
 		tops.append(h)
 		h += CURVE_H if curves[i] else LINE_H
+	h += (PAD / 2.0 if frame else 0.0) + inset
 	var with_arrows := arrows.any(func(a: Variant) -> bool: return a != null)
+	# framed: room for the arrow on both sides, so the text is centred
+	var arrow_room := ARROW_W * (2.0 if frame else 1.0) if with_arrows \
+		else 0.0
 	var w := maxf(min_w,
-		PAD * 2.0 + CHAR_W * widest + (ARROW_W if with_arrows else 0.0))
+		PAD * 2.0 + CHAR_W * widest + arrow_room + 2.0 * inset)
 
 	var panel := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(w, h, DEPTH)
-	panel.mesh = box
+	if frame:
+		panel.mesh = _rounded_panel(w, h)
+		panel.material_override = _arrow_material(colours[0])
+		var ring := MeshInstance3D.new()
+		ring.mesh = _frame_ring(w, h)
+		ring.material_override = _arrow_material(colours[1])
+		ring.position = Vector3(x, bottom + h / 2.0, DEPTH / 2.0 + 0.005)
+		ring.visibility_range_end = PANEL_M
+		root.add_child(ring)
+	else:
+		var box := BoxMesh.new()
+		box.size = Vector3(w, h, DEPTH)
+		panel.mesh = box
+		panel.material_override = _material(colours[0], true)
 	panel.position = Vector3(x, bottom + h / 2.0, 0.0)
-	panel.material_override = _material(colours[0], true)
 	panel.visibility_range_end = PANEL_M
 	root.add_child(panel)
 
@@ -260,20 +305,73 @@ func _panel(root: Node3D, x: float, bottom: float, source: Array,
 		label.shaded = false
 		label.double_sided = false
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.position = Vector3(x + (ARROW_W / 2.0 if with_arrows else 0.0),
-			y, DEPTH / 2.0 + 0.01)
+		label.position = Vector3(x + (ARROW_W / 2.0 if with_arrows
+			and not frame else 0.0), y, DEPTH / 2.0 + 0.01)
 		label.visibility_range_end = text_m
 		root.add_child(label)
 		if arrows[i] != null:
 			var arrow := MeshInstance3D.new()
 			arrow.mesh = _arrow_mesh
 			arrow.material_override = _material(colours[1], true)
-			arrow.position = Vector3(x - w / 2.0 + PAD + ARROW_W / 2.0 - 0.05,
-				y, DEPTH / 2.0 + 0.01)
+			arrow.position = Vector3(x - w / 2.0 + inset + PAD
+				+ ARROW_W / 2.0 - 0.05, y, DEPTH / 2.0 + 0.01)
 			arrow.rotation.z = arrows[i]
 			arrow.visibility_range_end = text_m
 			root.add_child(arrow)
 	return Vector2(w, h)
+
+
+## A pace note panel with its bottom at `bottom`: `lines` in pairs of
+## grade and "@curve_*", one column per pair side by side, in the
+## order given; returns its size.
+func _pace_panel(root: Node3D, bottom: float, lines: Array,
+		colours: Array) -> Vector2:
+	var pairs := lines.size() / 2
+	var size := Vector2(PACE_W * pairs, PACE_H)
+	var centre := Vector3(0.0, bottom + PACE_H / 2.0, 0.0)
+	var panel := MeshInstance3D.new()
+	if _framed:
+		panel.mesh = _rounded_panel(size.x, size.y)
+		panel.material_override = _arrow_material(colours[0])
+		var ring := MeshInstance3D.new()
+		ring.mesh = _frame_ring(size.x, size.y)
+		ring.material_override = _arrow_material(colours[1])
+		ring.position = centre + Vector3(0.0, 0.0, DEPTH / 2.0 + 0.005)
+		ring.visibility_range_end = PANEL_M
+		root.add_child(ring)
+	else:
+		var box := BoxMesh.new()
+		box.size = Vector3(size.x, size.y, DEPTH)
+		panel.mesh = box
+		panel.material_override = _material(colours[0], true)
+	panel.position = centre
+	panel.visibility_range_end = PANEL_M
+	root.add_child(panel)
+	for k in pairs:
+		var x := -size.x / 2.0 + PACE_W * (k + 0.5)
+		var label := Label3D.new()
+		label.text = lines[2 * k]
+		label.font_size = FONT_SIZE
+		label.pixel_size = PACE_PIXEL
+		label.modulate = colours[1]
+		label.outline_size = 0
+		label.shaded = false
+		label.double_sided = false
+		label.position = Vector3(x, bottom + PACE_H * PACE_GRADE_Y,
+			DEPTH / 2.0 + 0.01)
+		label.visibility_range_end = TEXT_M
+		root.add_child(label)
+		var bend := MeshInstance3D.new()
+		bend.mesh = _curve_mesh
+		bend.material_override = _arrow_material(colours[1])
+		bend.position = Vector3(x, bottom + PACE_H * PACE_CURVE_Y,
+			DEPTH / 2.0 + 0.01)
+		var mirror := -1.0 if lines[2 * k + 1] == CURVE_PREFIX + "left" \
+			else 1.0
+		bend.scale = Vector3(mirror, 1.0, 1.0) * PACE_CURVE_SCALE
+		bend.visibility_range_end = PANEL_M
+		root.add_child(bend)
+	return size
 
 
 ## An arrow pointing up (+Y), about LINE_H high, facing +Z: a shaft and
@@ -311,13 +409,23 @@ func _make_curve() -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_normal(Vector3.BACK)
+	# mitred: every path point offset along the mean of the normals of its
+	# two segments, so the pieces meet without notches on the outside
+	var offsets: Array[Vector2] = []
+	for k in path.size():
+		var d_in := (path[k] - path[maxi(k - 1, 0)]).normalized()
+		var d_out := (path[mini(k + 1, path.size() - 1)] - path[k]) \
+			.normalized()
+		var d := (d_in + d_out).normalized()
+		var n := Vector2(-d.y, d.x)
+		var n_seg := Vector2(-d_out.y, d_out.x) if k == 0 \
+			else Vector2(-d_in.y, d_in.x)
+		offsets.append(n * half / maxf(n.dot(n_seg), 0.5))
 	for k in range(path.size() - 1):
-		var d := (path[k + 1] - path[k]).normalized()
-		var n := Vector2(-d.y, d.x) * half
-		var a0 := path[k] + n
-		var a1 := path[k] - n
-		var b0 := path[k + 1] + n
-		var b1 := path[k + 1] - n
+		var a0 := path[k] + offsets[k]
+		var a1 := path[k] - offsets[k]
+		var b0 := path[k + 1] + offsets[k + 1]
+		var b1 := path[k + 1] - offsets[k + 1]
 		for v: Vector2 in [a0, a1, b0, b0, a1, b1]:
 			st.add_vertex(Vector3(v.x, v.y, 0.0))
 	# the head points along +X at the end of the arc
@@ -325,6 +433,59 @@ func _make_curve() -> ArrayMesh:
 	for v: Vector2 in [tip + Vector2(0.0, 0.2), tip + Vector2(0.0, -0.2),
 			tip + Vector2(0.3, 0.0)]:
 		st.add_vertex(Vector3(v.x, v.y, 0.0))
+	return st.commit()
+
+
+## The outline of a w x h rectangle centred on the origin, `inset` in
+## from its edge, corners rounded with FRAME_R - inset.
+static func _rounded_outline(w: float, h: float,
+		inset: float) -> Array[Vector2]:
+	var r := maxf(FRAME_R - inset, 0.0)
+	var hx := w / 2.0 - inset - r
+	var hy := h / 2.0 - inset - r
+	var pts: Array[Vector2] = []
+	for corner: Vector2 in [Vector2(hx, hy), Vector2(-hx, hy),
+			Vector2(-hx, -hy), Vector2(hx, -hy)]:
+		var start := atan2(signf(corner.y), signf(corner.x)) - PI / 4.0
+		for k in FRAME_STEPS + 1:
+			var a := start + PI / 2.0 * k / FRAME_STEPS
+			pts.append(corner + Vector2(cos(a), sin(a)) * r)
+	return pts
+
+
+## A panel w x h x DEPTH with rounded corners, centred on the origin.
+func _rounded_panel(w: float, h: float) -> ArrayMesh:
+	var pts := _rounded_outline(w, h, 0.0)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var n := pts.size()
+	for k in n:
+		var a := pts[k]
+		var b := pts[(k + 1) % n]
+		for z in [DEPTH / 2.0, -DEPTH / 2.0]:
+			for v: Vector2 in [Vector2.ZERO, a, b]:
+				st.add_vertex(Vector3(v.x, v.y, z))
+		var f := DEPTH / 2.0
+		for v: Vector3 in [Vector3(a.x, a.y, f), Vector3(b.x, b.y, f),
+				Vector3(b.x, b.y, -f), Vector3(a.x, a.y, f),
+				Vector3(b.x, b.y, -f), Vector3(a.x, a.y, -f)]:
+			st.add_vertex(v)
+	return st.commit()
+
+
+## The border of a framed w x h panel: a flat ring FRAME_W wide,
+## FRAME_MARGIN inside the edge.
+func _frame_ring(w: float, h: float) -> ArrayMesh:
+	var outer := _rounded_outline(w, h, FRAME_MARGIN)
+	var inner := _rounded_outline(w, h, FRAME_MARGIN + FRAME_W)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var n := outer.size()
+	for k in n:
+		var j := (k + 1) % n
+		for v: Vector2 in [outer[k], outer[j], inner[j], outer[k],
+				inner[j], inner[k]]:
+			st.add_vertex(Vector3(v.x, v.y, 0.0))
 	return st.commit()
 
 
@@ -356,3 +517,5 @@ func _material(colour: Color, unshaded := false) -> StandardMaterial3D:
 # - revised 2026-10-25 (town signs by country, two posts, panel beside the road)
 # - revised 2026-10-26 (pace note kinds, scale and bottom per sign)
 # - revised 2026-10-27 (Cyprus: country colours, Greek line in yellow, town style)
+# - revised 2026-11-04 (framed style trial: rounded corners, border, centred text)
+# - revised 2026-11-04 (framed by default, large pace note layout)
