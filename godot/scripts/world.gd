@@ -45,6 +45,7 @@ const ROUTE_START := -3
 @export var world_path := ""
 
 var _material := StandardMaterial3D.new()
+var _water := StandardMaterial3D.new()
 ## the routes to choose from (WorldLoader.routes()), the chosen one (-1:
 ## free drive), its points and its marks in the world
 var _routes: Array[Dictionary] = []
@@ -100,6 +101,10 @@ var _credits_due := true
 func _ready() -> void:
 	_material.vertex_color_use_as_albedo = true
 	_material.roughness = 1.0
+	_water.vertex_color_use_as_albedo = true
+	_water.roughness = 0.15
+	_water.metallic_specular = 0.8
+	_water.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_setup_environment()
 
 	var launch := WORLD_LOADER.args()
@@ -658,12 +663,17 @@ func _jump_to(index: int) -> void:
 
 
 ## Adds a world scene with the vertex colour material; with `collide`
-## every mesh but the markings gets trimesh collision. Skips a null scene
-## (the loader has reported it).
+## every mesh but the markings and the water gets trimesh collision. The
+## water surface (pipeline/water.py) takes _water: smooth, so it shines,
+## and opaque (the bed lies below it). Skips a null scene (the loader has
+## reported it).
 func _add_scene(scene: Node, collide: bool) -> void:
 	if scene == null:
 		return
 	for mesh: MeshInstance3D in scene.find_children("*", "MeshInstance3D"):
+		if mesh.name.begins_with("water"):
+			mesh.material_override = _water
+			continue
 		mesh.material_override = _material
 		if collide and mesh.name != "markings":
 			mesh.create_trimesh_collision()
@@ -722,3 +732,4 @@ func _setup_environment() -> void:
 # - revised 2026-10-26 (G toggles the route band)
 # - revised 2026-11-03 (sun shadows: shorter range, blend splits, bias)
 # - revised 2026-11-04 (half the ambient light, SSAO)
+# - revised 2026-11-04 (water surface material, no collision)

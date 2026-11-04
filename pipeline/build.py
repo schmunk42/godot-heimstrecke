@@ -38,6 +38,7 @@ from frame import Frame, xyz
 from metrics import CLIPPING_BASELINE, HARD_GATES, write_metrics
 from roads import ROAD_STEP, build_road_network, emit_network
 from sea import SHORE_M, coastlines, horizon_water, sea_polygon
+from water import Water
 from signs import country_of, write_signs
 from markings import emit_markings
 from sidewalks import assign as assign_sidewalks, emit_sidewalks
@@ -95,7 +96,7 @@ COVER_ORDER = ("urban", "farmland", "green", "scrub", "forest", "sand",
                "rock", "water")
 # mesh layers of a tile (glTF node names)
 LAYERS = ("terrain", "roads", "buildings", "tunnels", "bridges",
-          "markings", "verges")
+          "markings", "verges", "water")
 
 
 class InputError(RuntimeError):
@@ -276,10 +277,26 @@ def split_areas(ex, frame, sea=None):
     return cover, buildings
 
 
+def inland_water(ex, frame, half):
+    """Union of the OSM water areas (not the sea) within the playable
+    rectangle of half sides `half` (the raster ends DGM1_MARGIN beyond
+    it), local metres, or None."""
+    parts = [frame.geom_to_local(shapely.from_wkb(a["geom"]))
+             for a in ex["areas"] if a["kind"] == "water"]
+    if not parts:
+        return None
+    hx, hy = np.broadcast_to(half, 2)
+    water = shapely.intersection(shapely.make_valid(shapely.union_all(
+        parts)), shapely.box(-hx, -hy, hx, hy))
+    return None if water.is_empty else water
+
+
 def build_terrain(tiles, cover, dem, base, cut=None, colors_of=COLORS,
-                  biome="temperate"):
+                  biome="temperate", inland=None):
     """One grid per tile, coloured by land cover (colors_of, the biome's
     palette) and rock (biome.rock_share, not on water), minus the cut.
+    With `inland` (water.Water) the inland water gets its bed carved into
+    the grid and its surface into the tile's water layer.
 
     Returns the numbers of terrain triangles clipped and removed by the
     cut (the portal slots of tunnels.py).
@@ -308,6 +325,12 @@ def build_terrain(tiles, cover, dem, base, cut=None, colors_of=COLORS,
             share[water] = 0.0
             colors = colors * (1 - share) \
                 + np.asarray(colors_of["rock"]) * share
+        if inland is not None:
+            inland.carve(xs, ys, hs, colors, COLORS["gravel"])
+            top = inland.surface(xs, ys, faces)
+            if top is not None:
+                wx, wy, wh, wf = top
+                b["water"].add(xyz(wx, wh, wy), wf, COLORS["water"])
         if cut is not None and shapely.intersects(
                 cut, shapely.box(x0, y0, x0 + TILE, y0 + TILE)):
             xs, ys, hs, faces, colors, c, r = cut_mesh(xs, ys, hs, faces,
@@ -708,8 +731,11 @@ def main():
     t_roads = time.time()
     ground = conform(net, dem, base, tiles.half, TERRAIN_STEP, layout)
     tunnels = build_tunnels(net, ground, base, tiles)
+    water = Water(inland_water(ex, frame, tiles.half), ground, base,
+                  RoadsOver(net, layout))
     clipped, removed = build_terrain(tiles, cover, ground, base,
-                                     tunnels.cut, colors_of, recipe.biome)
+                                     tunnels.cut, colors_of, recipe.biome,
+                                     water)
     tunnels.stats.update(terrain_triangles_clipped=clipped,
                          terrain_triangles_removed=removed)
     emit_network(tiles, net, (COLORS["road"], COLORS["road_major"],
@@ -814,6 +840,8 @@ def main():
           f"{metrics['node_heights']['ground']['max']}")
     print("trees: " + " ".join(f"{k}={v}" for k, v in trees.stats.items()))
     print("sea: " + " ".join(f"{k}={v}" for k, v in sea_stats.items()))
+    print("water: " + " ".join(f"{k}={v}"
+                               for k, v in water.stats.items()))
     print("signs: " + " ".join(f"{k}={v}" for k, v in sign_stats.items()))
     print(" ".join(f"{k}={gates[k]}" for k in HARD_GATES))
     for st in meta.get("starts", []):
@@ -854,3 +882,4 @@ if __name__ == "__main__":
 # - revised 2026-10-25 (buildings under decks and raised roads capped)
 # - revised 2026-10-25 (gravel colour for tracks)
 # - revised 2026-11-04 (ground shade of the mediterranean biomes)
+# - revised 2026-11-04 (inland water as a surface, water.py)

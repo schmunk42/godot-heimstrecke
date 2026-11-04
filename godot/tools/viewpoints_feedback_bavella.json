@@ -1,10 +1,44 @@
 {
- "_comment": "file generated with AI assistance: Claude Code - 2026-11-04 15:40:00 UTC. Bavella: the D 268 climbing south-west below the pine forest, the view of the 2026-11-04 report that the world looked flat (camera far behind the car, # line of the report).",
+ "_comment": "file generated with AI assistance: Claude Code - 2026-11-04 15:40:00 UTC. Bavella: the D 268 climbing south-west below the pine forest, the view of the 2026-11-04 report that the world looked flat (camera far behind the car, # line of the report). bavella-water: the pool of the Solenzara below the D 268 that was only blue colour on a slope (2026-11-04 report that rivers should be surfaces).",
  "views": [
   {
    "name": "bavella-flat",
-   "position": [4795.7, -240.2, -4931.4],
-   "look_at": [4786.4, -243.2, -4913.9]
+   "position": [
+    4795.7,
+    -240.2,
+    -4931.4
+   ],
+   "look_at": [
+    4786.4,
+    -243.2,
+    -4913.9
+   ]
+  },
+  {
+   "name": "bavella-water",
+   "position": [
+    146.2,
+    -196.0,
+    -1964.0
+   ],
+   "look_at": [
+    126.5,
+    -199.3,
+    -1964.3
+   ]
+  },
+  {
+   "name": "bavella-water-high",
+   "position": [
+    180.0,
+    -170.0,
+    -1930.0
+   ],
+   "look_at": [
+    110.0,
+    -205.0,
+    -1980.0
+   ]
   }
  ]
 }
