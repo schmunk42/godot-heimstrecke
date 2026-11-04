@@ -1,0 +1,11 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-11-04 17:00:00 UTC. Bavella, Solenzara on the T 10 (Via di U Commandanti Poli), the views of the 2026-11-04 Street View comparison of facades and roofs: solenzara-street from the # line of the report (camera far behind the car), solenzara-north 22 m further back, solenzara-roofs the same street from 30 m above.",
+ "views": [
+  {"name": "solenzara-street", "position": [7004.6, -303.8, -4909.6],
+   "look_at": [6985.3, -306.8, -4913.9]},
+  {"name": "solenzara-north", "position": [7026.0, -304.0, -4904.8],
+   "look_at": [7006.7, -307.0, -4909.1]},
+  {"name": "solenzara-roofs", "position": [7040.0, -275.0, -4900.0],
+   "look_at": [6990.0, -305.0, -4912.0]}
+ ]
+}

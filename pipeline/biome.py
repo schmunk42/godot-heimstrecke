@@ -12,11 +12,14 @@ mapped Cupressus and shrubs (the maquis) on natural=scrub/heath. In
 Corsica (MAQUIS) the maquis also covers the land without another cover
 below MAQUIS["top_m"], as a nearly closed canopy of wide shrubs over a
 dark olive ground: OSM maps only a part of it, and the island's hills are
-dark green, not bare. Its
-houses have terracotta, ochre, salmon and granite facades under tile-red
-roofs (FACADES, ROOF), and a house standing alone outside the urban land
-cover (fewer than ISOLATED_NEIGHBOURS others within ISOLATED_M) without
-a height or levels tag has the ground floor only (GROUND_FLOOR_M).
+dark green, not bare. Its houses have ochre, peach, cream, pink and
+granite facades under hipped terracotta roofs (FACADES, ROOF, PITCHED),
+matched against Street View in Solenzara on 2026-11-04; an untagged
+house has two to four storeys by chance (STOREYS) instead of 9 m, and a
+house
+standing alone outside the urban land cover (fewer than
+ISOLATED_NEIGHBOURS others within ISOLATED_M) without a height or levels
+tag has the ground floor only (GROUND_FLOOR_M).
 
 mediterranean-dry (south-east Cyprus) is the drier, hotter variant:
 red-brown terra rossa on the fields, ochre and dry olive ground, pale
@@ -88,21 +91,50 @@ GROUND_MOTTLE = {"mediterranean": (0.07, (173.0, 61.0, 23.0)),
 MAQUIS = {"mediterranean": {"top_m": 1300.0, "step": 7.0,
                             "h": (1.5, 3.5), "spread": (3.0, 4.2)}}
 
+
+def srgb(c):
+    """The linear vertex colour that shows as the sRGB colour c: the
+    world material reads vertex colours as linear (world.gd), so a
+    palette value of 0.8 shows near white."""
+    return tuple(round(v ** 2.2, 4) for v in c)
+
+
 # facade colours: (share, from, to); the share picks by the centroid hash
-# (build.facade_color), the colour runs from `from` to `to` within it
-FACADES = {"mediterranean": (
-    (0.40, (0.80, 0.52, 0.36), (0.88, 0.63, 0.44)),  # terracotta
-    (0.30, (0.88, 0.75, 0.55), (0.80, 0.64, 0.45)),  # ochre, sand
-    (0.15, (0.90, 0.68, 0.58), (0.84, 0.58, 0.50)),  # salmon
-    (0.15, (0.60, 0.57, 0.53), (0.70, 0.66, 0.60)),  # granite
-), "mediterranean-dry": (
+# (build.facade_color), the colour runs from `from` to `to` within it;
+# the mediterranean ones are written as shown (srgb()), taken from Street
+# View in Solenzara
+FACADES = {"mediterranean": tuple((share, srgb(a), srgb(b))
+                                  for share, a, b in (
+    (0.30, (0.90, 0.76, 0.52), (0.85, 0.69, 0.45)),  # yellow ochre
+    (0.25, (0.92, 0.80, 0.68), (0.87, 0.72, 0.60)),  # peach, salmon
+    (0.25, (0.93, 0.88, 0.77), (0.87, 0.80, 0.66)),  # cream
+    (0.10, (0.88, 0.70, 0.60), (0.83, 0.63, 0.53)),  # pink terracotta
+    (0.10, (0.66, 0.62, 0.57), (0.56, 0.53, 0.49)),  # granite
+)), "mediterranean-dry": (
     (0.45, (0.95, 0.94, 0.91), (0.89, 0.88, 0.84)),  # whitewash
     (0.30, (0.92, 0.87, 0.75), (0.85, 0.78, 0.63)),  # cream, limestone
     (0.15, (0.88, 0.76, 0.56), (0.82, 0.68, 0.48)),  # light ochre
     (0.10, (0.74, 0.73, 0.70), (0.66, 0.65, 0.62)),  # concrete
 )}
-# roof colour; a biome without one draws the roof in the facade colour
-ROOF = {"mediterranean": (0.66, 0.33, 0.22)}
+# roof colour, from and to by the centroid hash like the facades; a biome
+# without one draws the roof in the facade colour
+ROOF = {"mediterranean": (srgb((0.80, 0.52, 0.38)),
+                          srgb((0.68, 0.42, 0.32)))}
+# hipped roofs (build.hip_roof): pitch as rise over run (canal tiles lie
+# low), eave overhang in m; only on footprints filling at least `rect` of
+# their oriented envelope with a short side up to `span` m, the others
+# (L shapes, halls) and FLAT_ROOFED kinds keep a flat roof
+PITCHED = {"mediterranean": {"pitch": 0.32, "eave": 0.4, "span": 16.0,
+                             "rect": 0.8}}
+FLAT_ROOFED = ("static_caravan", "ruins")
+# houses without a height or levels tag (building=yes or a house kind):
+# storeys by (share, count), picked by a centroid hash (build.storeys),
+# STOREY_M each plus PLINTH_M; Solenzara on Street View has two and three
+STOREYS = {"mediterranean": ((0.55, 2), (0.35, 3), (0.10, 4))}
+HOUSE_KINDS = ("yes", "house", "detached", "semidetached_house",
+               "terrace", "residential")
+STOREY_M = 3.0
+PLINTH_M = 0.5
 GROUND_FLOOR_M = {"mediterranean": 3.5, "mediterranean-dry": 3.5}
 ISOLATED_M = 60.0
 ISOLATED_NEIGHBOURS = 3
@@ -151,3 +183,5 @@ def rock_share(biome, heights, slope):
 # - revised 2026-10-27 (mediterranean-dry)
 # - revised 2026-11-04 (darker mediterranean ground, slope shade, mottle)
 # - revised 2026-11-04 (Corsican maquis on untagged land, darker ground)
+# - revised 2026-11-04 (Street View: facade colours as shown, hipped roofs,
+#   storeys)

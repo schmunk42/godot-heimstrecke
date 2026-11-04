@@ -26,8 +26,9 @@ import numpy as np
 import shapely
 import trimesh
 
-from biome import (FACADES, GROUND_FLOOR_M, ISOLATED_M, ISOLATED_NEIGHBOURS,
-                   ROOF, ground_shade, palette, rock_share)
+from biome import (FACADES, FLAT_ROOFED, GROUND_FLOOR_M, HOUSE_KINDS,
+                   ISOLATED_M, ISOLATED_NEIGHBOURS, PITCHED, PLINTH_M, ROOF,
+                   STOREY_M, STOREYS, ground_shade, palette, rock_share)
 from bridges import (DECK_DEPTH, build_decks, bridge_report, classify,
                      deck_half, normals, raise_decks, segment_index)
 from clipping import check_clipping, write_viewpoints
@@ -41,6 +42,7 @@ from sea import SHORE_M, coastlines, horizon_water, sea_polygon
 from water import Water
 from signs import country_of, write_signs
 from markings import emit_markings
+from rails import emit_rails
 from sidewalks import assign as assign_sidewalks, emit_sidewalks
 from skirts import emit_skirts
 from starts import StartError, build_starts
@@ -87,6 +89,8 @@ COLORS = {
     "sidewalk": (0.58, 0.58, 0.56),
     "kerb": (0.66, 0.66, 0.64),
     "marking": (0.86, 0.86, 0.82),
+    "ballast": (0.36, 0.34, 0.31),
+    "rail": (0.55, 0.55, 0.57),
     "route": (0.85, 0.15, 0.12),
     "horizon": (0.42, 0.52, 0.36),
 }
@@ -96,7 +100,7 @@ COVER_ORDER = ("urban", "farmland", "green", "scrub", "forest", "sand",
                "rock", "water")
 # mesh layers of a tile (glTF node names)
 LAYERS = ("terrain", "roads", "buildings", "tunnels", "bridges",
-          "markings", "verges", "water")
+          "markings", "verges", "water", "rails")
 
 
 class InputError(RuntimeError):
@@ -147,6 +151,45 @@ def extrude(poly, bottom, top):
             faces.append((o, o + 1, o + 2))
             faces.append((o, o + 2, o + 3))
             offset += 4
+    return np.vstack(verts), faces
+
+
+def hip_roof(poly, top, pitch, eave):
+    """Hipped roof over the oriented envelope of poly, grown by eave: the
+    four planes pass through the envelope's edges at top, rise at pitch
+    (rise over run) to a ridge along the long side and end eave beyond
+    the walls, lower by eave * pitch (a pyramid on a square). Each plane
+    has its own vertices and both windings, since the overhang is seen
+    from below. Vertices and faces like extrude()."""
+    env = np.asarray(shapely.oriented_envelope(poly).exterior.coords)[:4]
+    if np.hypot(*(env[1] - env[0])) < np.hypot(*(env[2] - env[1])):
+        env = np.roll(env, -1, axis=0)
+    long, wide = env[1] - env[0], env[2] - env[1]
+    length, width = np.hypot(*long), np.hypot(*wide)
+    u, v = long / length, wide / width
+    corners = np.array([env[0] - (u + v) * eave, env[1] + (u - v) * eave,
+                        env[2] + (u + v) * eave, env[3] - (u - v) * eave])
+    inset = u * min(width / 2, length / 2)
+    ridge = np.array([(env[0] + env[3]) / 2 + inset,
+                      (env[1] + env[2]) / 2 - inset])
+    low, high = top - eave * pitch, top + width / 2 * pitch
+    c0, c1, c2, c3 = ((*c, low) for c in corners)
+    r0, r1 = ((*r, high) for r in ridge)
+    planes = [(c0, c1, r1, r0), (c2, c3, r0, r1), (c3, c0, r0), (c1, c2, r1)]
+    verts, faces, offset = [], [], 0
+    for plane in planes:
+        pts = np.array(plane)
+        if len(pts) == 4 and np.allclose(pts[2], pts[3]):
+            pts = pts[:3]
+        tris = [(0, k, k + 1) for k in range(1, len(pts) - 1)]
+        ab, ac = pts[1, :2] - pts[0, :2], pts[2, :2] - pts[0, :2]
+        if ab[0] * ac[1] - ab[1] * ac[0] < 0:
+            tris = [(a, c, b) for a, b, c in tris]
+        for side in (tris, [(a, c, b) for a, b, c in tris]):
+            verts.append(xyz(pts[:, 0], pts[:, 2], pts[:, 1]))
+            faces += [(a + offset, b + offset, c + offset)
+                      for a, b, c in side]
+            offset += len(pts)
     return np.vstack(verts), faces
 
 
@@ -375,6 +418,41 @@ def facade_color(x, y, biome="temperate"):
     return tuple(grey[0] + (grey[1] - grey[0]) * t)
 
 
+def roof_color(x, y, biome):
+    """Roof colour of the building with centroid x, y, between the
+    biome's two ROOF colours by an integer mix of the centroid other than
+    facade_color()'s, so roof and facade vary apart."""
+    m = (int(x * 10) * 83492791 ^ int(y * 10) * 2654435761) % 1000
+    a, b = np.array(ROOF[biome][0]), np.array(ROOF[biome][1])
+    return tuple(a + (b - a) * m / 1000)
+
+
+def storeys(x, y, biome):
+    """Wall height of an untagged house with centroid x, y: STOREYS of
+    the biome picked by a third integer mix of the centroid."""
+    m = (int(x * 10) * 2246822519 ^ int(y * 10) * 3266489917) % 1000
+    lo = 0.0
+    for share, count in STOREYS[biome]:
+        lo += share
+        if m < lo * 1000:
+            break
+    return count * STOREY_M + PLINTH_M
+
+
+def pitched(geom, tags, biome):
+    """Whether the footprint piece geom gets a hipped roof (PITCHED)."""
+    if biome not in PITCHED or tags.get("building") in FLAT_ROOFED:
+        return False
+    env = shapely.oriented_envelope(geom)
+    if env.geom_type != "Polygon" or env.area <= 0.0:
+        return False
+    coords = np.asarray(env.exterior.coords)
+    short = min(np.hypot(*(coords[1] - coords[0])),
+                np.hypot(*(coords[2] - coords[1])))
+    return short <= PITCHED[biome]["span"] \
+        and geom.area >= PITCHED[biome]["rect"] * env.area
+
+
 def isolated(buildings, urban):
     """Per building: outside the urban land cover and fewer than
     ISOLATED_NEIGHBOURS other buildings within ISOLATED_M."""
@@ -441,16 +519,17 @@ def polygons(geom):
 
 def build_buildings(tiles, buildings, dem, base, biome="temperate",
                     urban=None, roads_over=None):
-    """Extruded footprints; with the biome's ROOF a tile-red roof, with
-    GROUND_FLOOR_M lone houses (isolated()) without a height or levels
-    tag on the ground floor only. Returns the count and the number of
-    those single-storey houses. With roads_over (RoadsOver) the part of
-    a footprint under a deck or a raised road ends BUILDING_CLEAR_M below
-    it; capped counts those buildings."""
-    count = low = capped = 0
+    """Extruded footprints; with the biome's ROOF a tile-red roof, hipped
+    where pitched() allows it (on pieces at full height, not under a
+    road), with GROUND_FLOOR_M lone houses (isolated()) without a height
+    or levels tag on the ground floor only. Returns the count, the number
+    of those single-storey houses, of capped and of hipped buildings.
+    With roads_over (RoadsOver) the part of a footprint under a deck or a
+    raised road ends BUILDING_CLEAR_M below it; capped counts those
+    buildings."""
+    count = low = capped = hipped = 0
     lone = isolated(buildings, urban) if biome in GROUND_FLOOR_M \
         else np.zeros(len(buildings), dtype=bool)
-    roof = ROOF.get(biome)
     for (geom, tags), alone in zip(buildings, lone):
         c = geom.centroid
         key = tiles.of(c.x, c.y)
@@ -464,17 +543,24 @@ def build_buildings(tiles, buildings, dem, base, biome="temperate",
         if alone and not tagged:
             top = bottom + GROUND_FLOOR_M[biome]
             low += 1
+        elif biome in STOREYS and not tagged \
+                and tags.get("building") in HOUSE_KINDS:
+            top = bottom + storeys(c.x, c.y, biome)
         else:
             top = bottom + building_height(tags)
         color = facade_color(c.x, c.y, biome)
+        roof = roof_color(c.x, c.y, biome) if biome in ROOF else None
         parts = roads_over.split(geom, bottom, top) \
             if roads_over is not None else None
         if parts is None:
             pieces = [(p, top) for p in getattr(geom, "geoms", [geom])]
+            hips = [pitched(p, tags, biome) for p, _ in pieces]
         else:
             pieces = [(p, h) for g, h in parts for p in polygons(g)]
+            hips = [False] * len(pieces)
             capped += 1
-        for p, h in pieces:
+        hipped += any(hips)
+        for (p, h), hip in zip(pieces, hips):
             try:
                 verts, faces = extrude(p, bottom - 1.0, h)
             except Exception:
@@ -486,11 +572,20 @@ def build_buildings(tiles, buildings, dem, base, biome="temperate",
                     len(i.coords) - 1 for i in p.interiors)
                 colors = np.tile(color, (len(verts), 1))
                 colors[:n_roof] = roof
+                if hip:
+                    # the flat top stays, hidden under the hipped roof
+                    rv, rf = hip_roof(p, h, PITCHED[biome]["pitch"],
+                                      PITCHED[biome]["eave"])
+                    faces = list(faces) + [(a + len(verts), b + len(verts),
+                                            c + len(verts))
+                                           for a, b, c in rf]
+                    verts = np.vstack([verts, rv])
+                    colors = np.vstack([colors, np.tile(roof, (len(rv), 1))])
                 tiles.buckets[key]["buildings"].add(verts, faces, colors)
             else:
                 tiles.buckets[key]["buildings"].add(verts, faces, color)
         count += 1
-    return count, low, capped
+    return count, low, capped, hipped
 
 
 def export_tiles(tiles, out):
@@ -744,6 +839,8 @@ def main():
                                     COLORS["kerb"])
     skirt_stats = emit_skirts(tiles, net, ground, base, COLORS["bank"])
     marking_stats = emit_markings(tiles, net, COLORS["marking"])
+    rail_stats, rail_lines = emit_rails(tiles, ex, frame, net, ground, base,
+                                        (COLORS["ballast"], COLORS["rail"]))
     clipping = check_clipping(net, ground, base, tiles.half)
     tunnels.emit(tiles, "tunnels")
     decks = build_decks(net, layout, tiles, ground, base)
@@ -752,11 +849,11 @@ def main():
                                     tiles.half),
                     **decks.stats}
     t_terrain = time.time()
-    building_count, single_storey, under_roads = build_buildings(
+    building_count, single_storey, under_roads, hipped = build_buildings(
         tiles, buildings, ground, base, recipe.biome, cover["urban"],
         RoadsOver(net, layout))
     trees = build_trees(ex, frame, net, cover, buildings, ground, base,
-                        tiles, tunnels.cut, recipe.biome)
+                        tiles, tunnels.cut, recipe.biome, rail_lines)
     t_buildings = time.time()
     tile_files, total_bytes = export_tiles(tiles, args.out)
     tree_meta = emit_trees(trees, tiles, TILE, args.out)
@@ -813,6 +910,7 @@ def main():
                             ground=ground, route_stats=route_stats,
                             tunnels=tunnels.stats, bridges=bridge_stats,
                             skirts=skirt_stats, markings=marking_stats,
+                            rails=rail_stats,
                             sidewalks=sidewalk_stats, clipping=clipping,
                             clipping_baseline_path=recipe.path.parent
                             / CLIPPING_BASELINE)
@@ -822,7 +920,7 @@ def main():
 
     print(f"tiles={len(tile_files)} road_km={road_km:.0f} "
           f"buildings={building_count} single_storey={single_storey} "
-          f"under_roads={under_roads} "
+          f"under_roads={under_roads} hipped={hipped} "
           f"trees={trees.stats['total']} "
           f"mb={total_bytes / 1e6:.1f} "
           f"cover_s={t_cover - started:.0f} "
@@ -883,3 +981,6 @@ if __name__ == "__main__":
 # - revised 2026-10-25 (gravel colour for tracks)
 # - revised 2026-11-04 (ground shade of the mediterranean biomes)
 # - revised 2026-11-04 (inland water as a surface, water.py)
+# - revised 2026-11-04 (hipped mediterranean roofs, roof colour by hash,
+#   storeys by hash)
+# - revised 2026-11-04 (railways in the rails layer)

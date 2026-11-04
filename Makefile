@@ -20,7 +20,7 @@ COP_URL := https://copernicus-dem-30m.s3.amazonaws.com
 COP_TILE = $(subst _,_00_,$*)_00
 
 # Goals that need no recipe; everything else reads it once.
-NO_RECIPE_GOALS := help init clean build render voice
+NO_RECIPE_GOALS := help init clean build render export-image export public voice
 define NL
 
 
@@ -190,3 +190,4 @@ export: ##@export export all three presets to build/<preset>/ (needs make export
 # - revised 2026-10-23 (terrain source from the recipe: DGM1 or LiDAR HD)
 # - revised 2026-10-23 (width and heading for fetch.py)
 # - revised 2026-10-26 (public snapshot)
+# - revised 2026-11-04 (export targets need no recipe, for the GitHub release workflow)

@@ -1,0 +1,57 @@
+{
+ "_comment": "file generated with AI assistance: Claude Code - 2026-11-04 18:40:00 UTC. Stuttgart, Ludwigsburger Straße at the Pragsattel, the spot of the 2026-11-04 railway report: pragsattel-street from the # line of the report (camera close behind the car), the Stadtbahn in the median on its ballast bed to the left; pragsattel-above the same stretch from 35 m above; street-rails-a and street-rails-b two Stadtbahn runs on a road (rails only, the road wins), 45 m above and 12 m beside the track.",
+ "views": [
+  {
+   "name": "pragsattel-street",
+   "position": [
+    -1992.9,
+    31.0,
+    -3804.5
+   ],
+   "look_at": [
+    -1988.2,
+    28.7,
+    -3823.8
+   ]
+  },
+  {
+   "name": "pragsattel-above",
+   "position": [
+    -1985.0,
+    63.0,
+    -3760.0
+   ],
+   "look_at": [
+    -2000.0,
+    28.0,
+    -3820.0
+   ]
+  },
+  {
+   "name": "street-rails-a",
+   "position": [
+    -621.4,
+    116.5,
+    1149.3
+   ],
+   "look_at": [
+    -633.4,
+    71.5,
+    1137.3
+   ]
+  },
+  {
+   "name": "street-rails-b",
+   "position": [
+    -3031.0,
+    92.4,
+    731.0
+   ],
+   "look_at": [
+    -3043.0,
+    47.4,
+    719.0
+   ]
+  }
+ ]
+}
