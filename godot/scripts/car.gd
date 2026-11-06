@@ -3,8 +3,8 @@ extends RigidBody3D
 ## Simcade raycast car: four suspension rays, tire grip clamped by a
 ## friction circle, the drive split between the axles by the car's
 ## `front_drive` share. Proportions, drivetrain and engine come from an
-## entry of cars.gd (three Audi quattro versions, the Lamborghini Huracán
-## STO), the body from car_model.gd: an engine with a torque curve and
+## entry of cars.gd (eight cars after real ones, under made-up names),
+## the body from car_model.gd: an engine with a torque curve and
 ## optional turbo lag, gears shifted automatically, sounds in
 ## car_audio.gd. Front is -Z.
 ##
@@ -405,3 +405,4 @@ func _axis(axis: JoyAxis) -> float:
 # - revised 2026-10-23 (F asks world.gd for the nearest road)
 # - revised 2026-10-23 (show_body for the driver view)
 # - revised 2026-11-04 (handbrake locks the rear wheels for hairpins)
+# - revised 2026-11-06 (car list in the doc comment)

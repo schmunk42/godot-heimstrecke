@@ -10,6 +10,7 @@ Review of the licences of the map material and the software of Heimstrecke, stat
 - The `sources` and `attribution` strings of the recipes were not the wording the licences ask for; they are corrected since 2026-10-25, see [Decisions](#decisions).
 - Since 2026-10-25 the world selection has a credits screen with the data credits and links, the data licence and the Godot notices; the attribution also shows for five seconds after the start.
 - Whether the generated tiles are a Produced Work or a Derivative Database under the ODbL is not settled by any OSMF guideline. Decided on 2026-10-25: the world data is put under the ODbL as a whole, so a shared `.world` package is fine either way.
+- The cars carry made-up names and no brand marks since 2026-11-06, see [Vehicles](#vehicles).
 - The repository bundles no fonts or textures. Since 2026-11-04 it bundles the co-driver's voice clips, synthesised with Piper from a voice trained on public domain recordings, see [Co-driver voice](#co-driver-voice). The project's own code is under the MIT License since 2026-10-25.
 
 ## Decisions
@@ -94,6 +95,15 @@ Decided on 2026-11-04. The clips in `godot/audio/codriver/` (one Ogg Vorbis file
 - **Piper** itself (piper-tts 1.8.0, GPL-3.0-or-later per its package metadata) is a tool run once on the developer's machine; it is neither committed nor shipped, and its licence does not reach the audio it makes.
 - **Voices not taken**: `en_US-joe-medium` sounded best and its own dataset is CC0, but its model card says it is fine-tuned from `en_US-lessac`, which is trained on the Blizzard 2013 Lessac data under a research licence granted only to the named licensee; `en_US-john-medium` is fine-tuned from a voice whose data is not stated. Both were left out for that reason. `en_GB-cori-high` (LibriVox, from scratch) would be clean as well.
 
+## Vehicles
+
+Decided on 2026-11-06. The cars are modelled on real ones (the 1980s Audi quattro and Sport quattro, Lamborghini Huracán STO, Subaru Impreza WRX STI, VW Golf II GTI 16V, Ferrari F40, Porsche 911 GT3 RS): proportions, power, torque, gears and weights come from data sheets and tests, the bodies are procedural lofts written in `car_model.gd`. Copyright and licences do not come into it, because nothing is taken over: no model, texture or sound. The risk lies in trademark and design law:
+
+- **Names and badges are trademarks.** Makers license their cars to games and enforce it; a free download is still public use. The menu therefore shows made-up names (Rally Coupé Turbo, Wedge V10, Hot Hatch 16V, ...) and the bodies carry no brand marks: the four Audi rings, the only badge there was, were removed for 0.1.1. Code comments and this documentation still name the real cars as the source of the data, which is descriptive use.
+- **Body shapes can be registered designs**, protected for at most 25 years from filing. Probably expired: quattro (1980), Golf II (1983), F40 (1987). Probably still protected: Impreza GD (from 2000), 911 type 992 (2019), Huracán STO (2021); Porsche also defends the 911 silhouette as a shape mark *(from memory, not verified)*. The procedural bodies are coarse, but meant to be recognised. Not changed so far; it is the remaining point for a legal review, and the way out would be to change the most distinctive features of the three newer bodies (lights, intakes, wing) or to drop them.
+- **Facts are free**: power, torque, gear ratios, weights and 0-100 times are not protected.
+- **Made-up brands** on the junction boards (oil and tyres) must not resemble real ones.
+
 ## Open questions for legal review
 
 1. Are the glTF tiles and the tree-instance files a Produced Work or a Derivative Database, or each by part? No guideline covers 3D game geometry.
@@ -103,6 +113,7 @@ Decided on 2026-11-04. The clips in `godot/audio/codriver/` (one Ogg Vorbis file
 5. From which point is showing the game "public use": events, shared builds, external testers?
 6. Do the committed `route.json` files (OSRM output, OSM-derived) need more than the OSM credit?
 7. Which licence do the project's own code and content get, and does a build with an embedded world fall under the ODbL notice duty?
+8. Are the bodies of the three newer cars (Impreza GD, 911 type 992, Huracán STO) close enough to registered designs or a shape mark to need a change, see [Vehicles](#vehicles)?
 
 ## Checklist for a new world
 
@@ -127,3 +138,4 @@ Decided on 2026-11-04. The clips in `godot/audio/codriver/` (one Ogg Vorbis file
 <!-- - revised 2026-10-23 (IGN LiDAR HD for the Corsican worlds) -->
 <!-- - revised 2026-10-25 (decisions: ODbL world data, MIT code, credits corrected, credits screen) -->
 <!-- - revised 2026-10-27 (GEDTM30 for Cyprus) -->
+<!-- - revised 2026-11-06 (vehicles: trademarks and designs) -->
