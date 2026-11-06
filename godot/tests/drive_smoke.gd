@@ -16,7 +16,8 @@ extends SceneTree
 ## upright and never drop more than `sink_m` below the road surface.
 ## Then every car of the start menu (car.gd CARS) is put on the route
 ## start: it must settle upright, reach 100 km/h within CAR_TIMEOUT_S at
-## full throttle and stay upright; the 0-100 times are printed.
+## full throttle (or the `test` speed and time of its cars.gd entry) and
+## stay upright; the times are printed.
 ## It measures 0-50 km/h (during the throttle phase) and 30-0 km/h in
 ## physics ticks (machine independent) plus the wall-clock load time, and
 ## compares them with res://tests/reference_<world id>.json. Exits
@@ -41,7 +42,8 @@ const REFERENCE := "res://tests/reference_%s.json"
 const SMOKE_FILE := "../worlds/%s/smoke.json"
 ## preloaded: without the editor's class cache class_name is unknown
 const WORLD_LOADER := preload("res://scripts/world_loader.gd")
-const WATCHDOG_S := 180.0
+# the slow cars of cars.gd take up to 30 s each at full throttle
+const WATCHDOG_S := 480.0
 const THROTTLE_S := 6
 const BRAKE_TIMEOUT_S := 6.0
 const TOLERANCE := 0.10
@@ -283,19 +285,21 @@ func _check_cars(world: Node, car: RigidBody3D) -> void:
 			and car.linear_velocity.length() < 1.0,
 			"car %d (%s) rests upright" % [i + 1, name])
 		_key(KEY_W, true)
-		var limit := roundi(CAR_TIMEOUT_S * _tps)
+		var test: Array = cars[i].get("test", [100.0, CAR_TIMEOUT_S])
+		var kmh: float = test[0]
+		var limit := roundi(float(test[1]) * _tps)
 		var ticks := 0
 		var upright := true
-		while ticks < limit and car.speed_kmh < 100.0:
+		while ticks < limit and car.speed_kmh < kmh:
 			await physics_frame
 			upright = upright and car.global_basis.y.y > 0.8
 			ticks += 1
 		_key(KEY_W, false)
-		_sample("car %d at 100 km/h" % (i + 1), car)
-		print("car %d (%s): 0-100 km/h in %.2f s" % [i + 1, name,
+		_sample("car %d at %.0f km/h" % [i + 1, kmh], car)
+		print("car %d (%s): 0-%.0f km/h in %.2f s" % [i + 1, name, kmh,
 			ticks / _tps])
-		_check(car.speed_kmh >= 100.0, "car %d (%s) reaches 100 km/h "
-			% [i + 1, name] + "within %.0f s" % CAR_TIMEOUT_S)
+		_check(car.speed_kmh >= kmh, "car %d (%s) reaches %.0f km/h "
+			% [i + 1, name, kmh] + "within %.0f s" % test[1])
 		_check(upright, "car %d (%s) upright at full throttle"
 			% [i + 1, name])
 	car.call("set_car", 0)
@@ -538,3 +542,4 @@ func _key(code: Key, pressed: bool) -> void:
 # - revised 2026-10-22 (per-world reference and smoke.json, no-route worlds)
 # - revised 2026-10-23 (F: off the road first, then back on the nearest road)
 # - revised 2026-10-26 (tunnel and bridge runs in free drive)
+# - revised 2026-11-06 (test speed and time per car)

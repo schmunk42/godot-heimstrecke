@@ -3,15 +3,19 @@ extends RefCounted
 ## Procedural car bodies: lofted bodies with box wheel arches, a
 ## greenhouse (all dark glass, or in the paint with glass windows), trim,
 ## lights and wheels with tyre and rim; no brand marks (see
-## docs/licences.md#vehicles). Seven bodies (BODIES), chosen by the `body` key of
-## a cars.gd entry: the 1980s Audi quattro (Typ 85) with its upright nose
+## docs/licences.md#vehicles). Sixteen bodies (BODIES), chosen by the
+## `body` key of a cars.gd entry: the 1980s Audi quattro (Typ 85) with its upright nose
 ## and sloping rear window down to the tail, the Sport quattro with the
 ## shorter wheelbase and the steeper windscreen, the Lamborghini
 ## Huracán STO, a low wedge with an orange splitter and skirts, a roof
 ## scoop, a fin and a rear wing, the Subaru Impreza saloon with bonnet
 ## scoop and boot wing, the boxy Golf II hatchback, the Ferrari F40 with
 ## its full-width tail wing and the Porsche 911 GT3 RS with round
-## headlights on the wings and the swan-neck wing.
+## headlights on the wings and the swan-neck wing; since 0.2.0 the
+## Lancia Delta Integrale, the Renault 5 Turbo, the Ford Focus RS (Mk1),
+## the BMW M Coupé, the Mercedes SL 63 (R230), a formula car of the V10
+## years with open wheels, the VW Käfer 1303 S, the Trabant 601 and the
+## Unimog U 5023 with its frame and cab above the wheels.
 ## Front is -Z, ground at y = 0.
 
 ## Body sections front to back, ground at y = 0: z, half width, sill
@@ -181,6 +185,181 @@ const GOLF_CANOPY := [
 	[1.80, 0.64, 0.93, 1.03],
 	[1.86, 0.63, 0.94, 0.98],
 ]
+## Lancia Delta HF Integrale Evoluzione: front axle at z = -1.24, 3.90 m
+## long, 1.77 m wide over the box flares, a tall five-door box.
+const DELTA_BODY := [
+	[-1.96, 0.78, 0.28, 0.64],
+	[-1.90, 0.82, 0.25, 0.72],
+	[-1.40, 0.82, 0.25, 0.82],
+	[-0.80, 0.82, 0.26, 0.90],
+	[1.30, 0.82, 0.27, 0.93],
+	[1.86, 0.81, 0.30, 0.94],
+	[1.94, 0.78, 0.36, 0.92],
+]
+## windscreen, roof at 1.36 m, a steep tailgate
+const DELTA_CANOPY := [
+	[-0.85, 0.72, 0.88, 0.91],
+	[-0.25, 0.68, 0.90, 1.34],
+	[1.35, 0.67, 0.92, 1.36],
+	[1.85, 0.64, 0.93, 1.02],
+	[1.92, 0.63, 0.94, 0.97],
+]
+## Renault 5 Turbo 2: front axle at z = -1.215, 3.66 m long, 1.75 m wide
+## over the rear flares that carry the intakes for the mid engine.
+const R5_BODY := [
+	[-1.77, 0.74, 0.30, 0.62],
+	[-1.70, 0.78, 0.27, 0.72],
+	[-1.30, 0.78, 0.27, 0.80],
+	[-0.80, 0.78, 0.27, 0.86],
+	[0.40, 0.80, 0.27, 0.88],
+	[0.70, 0.86, 0.27, 0.90],
+	[1.70, 0.87, 0.28, 0.92],
+	[1.90, 0.84, 0.33, 0.90],
+]
+## windscreen, roof at 1.32 m, the sloping hatch
+const R5_CANOPY := [
+	[-0.85, 0.66, 0.84, 0.88],
+	[-0.30, 0.62, 0.86, 1.30],
+	[0.75, 0.60, 0.88, 1.32],
+	[1.55, 0.58, 0.90, 1.00],
+	[1.70, 0.58, 0.91, 0.94],
+]
+## Ford Focus RS (Mk1): front axle at z = -1.3075, 4.17 m long, 1.79 m
+## wide, a three-door hatchback.
+const FOCUS_BODY := [
+	[-2.17, 0.78, 0.28, 0.62],
+	[-2.10, 0.84, 0.24, 0.70],
+	[-1.60, 0.86, 0.24, 0.84],
+	[-0.80, 0.87, 0.25, 0.96],
+	[1.40, 0.88, 0.27, 0.99],
+	[1.92, 0.86, 0.30, 1.00],
+	[2.00, 0.80, 0.38, 0.98],
+]
+const FOCUS_CANOPY := [
+	[-0.85, 0.74, 0.92, 0.96],
+	[-0.05, 0.66, 0.94, 1.40],
+	[1.20, 0.66, 0.96, 1.42],
+	[1.80, 0.66, 0.98, 1.20],
+	[1.98, 0.64, 0.99, 1.00],
+]
+## BMW M Coupé (E36/8): front axle at z = -1.2295, 4.03 m long, 1.74 m
+## wide; a long bonnet and the flat roof running back to an upright
+## tailgate (the "breadvan").
+const MCOUPE_BODY := [
+	[-2.03, 0.76, 0.28, 0.58],
+	[-1.96, 0.82, 0.24, 0.66],
+	[-1.50, 0.84, 0.24, 0.74],
+	[-0.60, 0.85, 0.25, 0.82],
+	[1.20, 0.86, 0.26, 0.86],
+	[1.85, 0.85, 0.28, 0.90],
+	[2.00, 0.80, 0.36, 0.88],
+]
+const MCOUPE_CANOPY := [
+	[-0.62, 0.72, 0.80, 0.83],
+	[-0.05, 0.64, 0.82, 1.25],
+	[1.45, 0.64, 0.86, 1.26],
+	[1.92, 0.66, 0.88, 1.10],
+	[1.98, 0.66, 0.88, 0.95],
+]
+## Mercedes SL 63 AMG (R230): front axle at z = -1.28, 4.56 m long,
+## 1.82 m wide, the long bonnet of a front-engined roadster with the
+## hardtop up.
+const SL_BODY := [
+	[-2.23, 0.80, 0.28, 0.58],
+	[-2.15, 0.86, 0.24, 0.66],
+	[-1.70, 0.89, 0.24, 0.76],
+	[-0.70, 0.90, 0.25, 0.86],
+	[0.80, 0.90, 0.26, 0.90],
+	[1.80, 0.89, 0.28, 0.93],
+	[2.25, 0.86, 0.32, 0.92],
+	[2.33, 0.80, 0.40, 0.88],
+]
+const SL_CANOPY := [
+	[-0.75, 0.74, 0.84, 0.87],
+	[-0.10, 0.66, 0.86, 1.28],
+	[0.55, 0.64, 0.88, 1.30],
+	[1.10, 0.66, 0.89, 1.12],
+	[1.55, 0.72, 0.91, 0.94],
+]
+## Formula car of the V10 years (about 2004): axles at z = -1.55 and
+## 1.55 (3.10 m wheelbase), 4.6 m long, open wheels; a thin nose, the
+## monocoque, side pods 1.36 m across between the wheels and the
+## gearbox between the rear wheels.
+const F1_BODY := [
+	[-2.55, 0.12, 0.10, 0.25],
+	[-2.00, 0.17, 0.12, 0.42],
+	[-1.30, 0.25, 0.10, 0.58],
+	[-0.80, 0.32, 0.08, 0.66],
+	[-0.70, 0.65, 0.08, 0.60],
+	[0.30, 0.68, 0.08, 0.62],
+	[1.00, 0.40, 0.08, 0.58],
+	[1.25, 0.25, 0.10, 0.50],
+	[2.05, 0.18, 0.15, 0.45],
+]
+## the airbox above the driver's head and the engine cover, in the paint
+const F1_CANOPY := [
+	[-0.25, 0.14, 0.60, 0.98],
+	[0.00, 0.16, 0.60, 1.00],
+	[0.90, 0.14, 0.58, 0.72],
+	[1.50, 0.10, 0.48, 0.52],
+]
+## VW Käfer 1303 S: front axle at z = -1.21, 4.08 m long, 1.585 m wide
+## over the wings; the rounded body below the dome of the cabin, which
+## runs down to the engine lid.
+const KAEFER_BODY := [
+	[-2.02, 0.52, 0.40, 0.56],
+	[-1.90, 0.64, 0.32, 0.70],
+	[-1.50, 0.70, 0.30, 0.85],
+	[-0.90, 0.72, 0.30, 0.94],
+	[0.60, 0.74, 0.30, 0.98],
+	[1.40, 0.72, 0.32, 0.96],
+	[1.90, 0.62, 0.38, 0.78],
+	[2.06, 0.50, 0.45, 0.60],
+]
+const KAEFER_CANOPY := [
+	[-0.95, 0.66, 0.92, 0.96],
+	[-0.50, 0.62, 0.94, 1.40],
+	[0.10, 0.62, 0.96, 1.50],
+	[0.70, 0.62, 0.97, 1.44],
+	[1.20, 0.62, 0.97, 1.22],
+	[1.70, 0.58, 0.90, 0.94],
+]
+## Trabant 601: front axle at z = -1.01, 3.56 m long, 1.51 m wide, a
+## small notchback saloon.
+const TRABANT_BODY := [
+	[-1.73, 0.68, 0.30, 0.62],
+	[-1.66, 0.72, 0.27, 0.72],
+	[-1.20, 0.74, 0.27, 0.80],
+	[-0.75, 0.74, 0.27, 0.86],
+	[0.80, 0.75, 0.28, 0.88],
+	[1.70, 0.74, 0.30, 0.90],
+	[1.82, 0.70, 0.36, 0.86],
+]
+const TRABANT_CANOPY := [
+	[-0.80, 0.66, 0.84, 0.87],
+	[-0.25, 0.62, 0.86, 1.42],
+	[0.70, 0.62, 0.87, 1.44],
+	[1.10, 0.63, 0.88, 0.94],
+]
+## Unimog U 5023: axles at z = -1.925 and 1.925 (3.85 m wheelbase),
+## 5.4 m long, 2.3 m wide; the frame with bonnet and flatbed lies above
+## the wheels (no arches), the cab sits over the front axle.
+const UNIMOG_BODY := [
+	[-2.75, 1.00, 0.70, 1.15],
+	[-2.62, 1.08, 1.25, 1.50],
+	[-2.25, 1.10, 1.25, 1.62],
+	[-0.95, 1.12, 1.25, 1.62],
+	[-0.88, 1.15, 1.25, 1.50],
+	[2.55, 1.15, 1.25, 1.50],
+	[2.65, 1.12, 1.25, 1.45],
+]
+## the cab: windscreen, roof at 2.9 m, flat back wall
+const UNIMOG_CANOPY := [
+	[-2.30, 1.00, 1.60, 1.70],
+	[-2.15, 1.02, 1.60, 2.85],
+	[-0.95, 1.05, 1.60, 2.90],
+	[-0.90, 1.05, 1.60, 2.85],
+]
 ## Windows of a greenhouse in the paint (the 1980s Audis): windscreen
 ## and rear window as z ranges on the canopy top, each inside one canopy
 ## segment; side windows as outlines of z, y points on the canopy side,
@@ -215,9 +394,57 @@ const GOLF_WINDOWS := {
 		[[-0.66, 0.98], [-0.24, 1.35], [0.45, 1.35], [0.45, 0.98]],
 		[[0.53, 0.98], [0.53, 1.35], [1.10, 1.35], [1.40, 0.98]]],
 }
+const DELTA_WINDOWS := {
+	"front": [-0.82, -0.28], "rear": [1.38, 1.82],
+	"side": [
+		[[-0.70, 0.94], [-0.27, 1.30], [0.35, 1.30], [0.35, 0.94]],
+		[[0.43, 0.94], [0.43, 1.30], [1.05, 1.30], [1.05, 0.94]],
+		[[1.12, 0.94], [1.12, 1.30], [1.32, 1.30], [1.55, 0.98]]],
+}
+const R5_WINDOWS := {
+	"front": [-0.82, -0.33], "rear": [0.80, 1.50],
+	"side": [
+		[[-0.65, 0.90], [-0.30, 1.26], [0.40, 1.26], [0.40, 0.90]],
+		[[0.48, 0.90], [0.48, 1.26], [0.75, 1.26], [1.25, 0.95]]],
+}
+const FOCUS_WINDOWS := {
+	"front": [-0.82, -0.10], "rear": [1.25, 1.78],
+	"side": [
+		[[-0.62, 0.99], [-0.05, 1.36], [0.70, 1.36], [0.70, 0.99]],
+		[[0.78, 0.99], [0.78, 1.36], [1.25, 1.34], [1.55, 1.02]]],
+}
+const MCOUPE_WINDOWS := {
+	"front": [-0.60, -0.08], "rear": [1.50, 1.90],
+	"side": [
+		[[-0.45, 0.88], [-0.05, 1.22], [0.60, 1.22], [0.60, 0.88]],
+		[[0.68, 0.88], [0.68, 1.22], [1.40, 1.22], [1.40, 0.90]]],
+}
+const SL_WINDOWS := {
+	"front": [-0.72, -0.14], "rear": [0.60, 1.07],
+	"side": [
+		[[-0.55, 0.90], [-0.10, 1.24], [0.75, 1.24], [1.10, 0.92]]],
+}
+const KAEFER_WINDOWS := {
+	"front": [-0.92, -0.52], "rear": [0.75, 1.15],
+	"side": [
+		[[-0.75, 0.98], [-0.42, 1.40], [0.35, 1.42], [0.35, 0.98]],
+		[[0.43, 0.98], [0.43, 1.40], [0.80, 1.38], [1.10, 1.05]]],
+}
+const TRABANT_WINDOWS := {
+	"front": [-0.77, -0.28], "rear": [0.74, 1.07],
+	"side": [
+		[[-0.62, 0.89], [-0.25, 1.38], [0.25, 1.38], [0.25, 0.89]],
+		[[0.33, 0.89], [0.33, 1.38], [0.68, 1.38], [0.95, 0.92]]],
+}
+const UNIMOG_WINDOWS := {
+	"front": [-2.29, -2.16], "rear": [-0.94, -0.91],
+	"side": [
+		[[-2.05, 1.95], [-2.12, 2.70], [-1.10, 2.70], [-1.10, 1.95]]],
+}
 ## body: sections, canopy, superellipse exponents of body and canopy
 ## (smaller is boxier), rim radius, windows (empty: all-glass canopy),
-## arches: axle positions and half width over the flares (optional)
+## arches: axle positions and half width over the flares (optional),
+## canopy_paint: the canopy in the paint without glass (optional)
 const BODIES := {
 	"quattro": {"body": QUATTRO_BODY, "canopy": QUATTRO_CANOPY,
 		"shape": Vector2(0.07, 0.14), "canopy_shape": Vector2(0.06, 0.1),
@@ -246,6 +473,40 @@ const BODIES := {
 		"shape": Vector2(0.07, 0.14), "canopy_shape": Vector2(0.06, 0.1),
 		"rim": 0.178, "windows": GOLF_WINDOWS,
 		"arches": {"axles": [-1.2375, 1.2375], "flare": 0.84}},
+	"delta": {"body": DELTA_BODY, "canopy": DELTA_CANOPY,
+		"shape": Vector2(0.06, 0.12), "canopy_shape": Vector2(0.05, 0.1),
+		"rim": 0.203, "windows": DELTA_WINDOWS,
+		"arches": {"axles": [-1.24, 1.24], "flare": 0.885}},
+	"r5": {"body": R5_BODY, "canopy": R5_CANOPY,
+		"shape": Vector2(0.07, 0.14), "canopy_shape": Vector2(0.06, 0.1),
+		"rim": 0.17, "windows": R5_WINDOWS,
+		"arches": {"axles": [-1.215, 1.215], "flare": 0.875}},
+	"focus": {"body": FOCUS_BODY, "canopy": FOCUS_CANOPY,
+		"shape": Vector2(0.12, 0.2), "canopy_shape": Vector2(0.1, 0.15),
+		"rim": 0.229, "windows": FOCUS_WINDOWS,
+		"arches": {"axles": [-1.3075, 1.3075], "flare": 0.89}},
+	"mcoupe": {"body": MCOUPE_BODY, "canopy": MCOUPE_CANOPY,
+		"shape": Vector2(0.15, 0.25), "canopy_shape": Vector2(0.1, 0.2),
+		"rim": 0.216, "windows": MCOUPE_WINDOWS,
+		"arches": {"axles": [-1.2295, 1.2295], "flare": 0.87}},
+	"sl": {"body": SL_BODY, "canopy": SL_CANOPY,
+		"shape": Vector2(0.2, 0.3), "canopy_shape": Vector2(0.2, 0.35),
+		"rim": 0.241, "windows": SL_WINDOWS,
+		"arches": {"axles": [-1.28, 1.28], "flare": 0.91}},
+	"f1": {"body": F1_BODY, "canopy": F1_CANOPY,
+		"shape": Vector2(0.35, 0.5), "canopy_shape": Vector2(0.6, 0.8),
+		"rim": 0.17, "windows": {}, "canopy_paint": true},
+	"kaefer": {"body": KAEFER_BODY, "canopy": KAEFER_CANOPY,
+		"shape": Vector2(0.45, 0.6), "canopy_shape": Vector2(0.3, 0.5),
+		"rim": 0.19, "windows": KAEFER_WINDOWS,
+		"arches": {"axles": [-1.21, 1.21], "flare": 0.79}},
+	"trabant": {"body": TRABANT_BODY, "canopy": TRABANT_CANOPY,
+		"shape": Vector2(0.1, 0.18), "canopy_shape": Vector2(0.08, 0.14),
+		"rim": 0.165, "windows": TRABANT_WINDOWS,
+		"arches": {"axles": [-1.01, 1.01], "flare": 0.75}},
+	"unimog": {"body": UNIMOG_BODY, "canopy": UNIMOG_CANOPY,
+		"shape": Vector2(0.04, 0.08), "canopy_shape": Vector2(0.05, 0.08),
+		"rim": 0.30, "windows": UNIMOG_WINDOWS},
 }
 ## glass offset outside the canopy, windscreen and rear window inset from
 ## its sides (the pillars), m
@@ -284,7 +545,10 @@ static func build(parent: Node3D, wheel_parent: Node3D,
 	glass.metallic = 0.3
 	glass.roughness = 0.05
 	var windows: Dictionary = body.windows
-	if windows.is_empty():
+	if body.get("canopy_paint", false):
+		_add(parent, _loft(body.canopy, paint, body.canopy_shape),
+			Vector3.ZERO)
+	elif windows.is_empty():
 		_add(parent, _loft(body.canopy, glass, body.canopy_shape),
 			Vector3.ZERO)
 	else:
@@ -311,6 +575,24 @@ static func build(parent: Node3D, wheel_parent: Node3D,
 			_gt3rs_details(parent, trim)
 		"golf":
 			_golf_details(parent, trim)
+		"delta":
+			_delta_details(parent, paint, trim)
+		"r5":
+			_r5_details(parent, trim)
+		"focus":
+			_focus_details(parent, paint, trim)
+		"mcoupe":
+			_mcoupe_details(parent, trim)
+		"sl":
+			_sl_details(parent, paint, trim)
+		"f1":
+			_f1_details(parent, paint, trim)
+		"kaefer":
+			_kaefer_details(parent, trim)
+		"trabant":
+			_trabant_details(parent, trim)
+		"unimog":
+			_unimog_details(parent, paint, trim)
 
 	var wheels: Array[MeshInstance3D] = []
 	var tyre := StandardMaterial3D.new()
@@ -530,6 +812,248 @@ static func _golf_details(parent: Node3D, trim: Material) -> void:
 			Vector3(side * 0.825, 0.40, 0.0), trim)
 
 
+## Delta Integrale: four round headlights in the black grille band, the
+## vents in the bonnet, black bumpers and sill strips, the spoiler on top
+## of the tailgate and the tail light band.
+static func _delta_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	var z := -1.97
+	_box(parent, Vector3(1.50, 0.16, 0.04), Vector3(0.0, 0.64, z), trim)
+	_box(parent, Vector3(1.62, 0.16, 0.10), Vector3(0.0, 0.40, z + 0.02),
+		trim)
+	_box(parent, Vector3(1.62, 0.16, 0.10), Vector3(0.0, 0.42, 1.93), trim)
+	for x in [-0.15, 0.15]:
+		_box(parent, Vector3(0.16, 0.02, 0.36), Vector3(x, 0.835, -1.30),
+			trim, Vector3(0.08, 0.0, 0.0))
+	for side in [-1.0, 1.0]:
+		for x in [0.42, 0.62]:
+			_lamp(parent, 0.075, Vector3(side * x, 0.64, z - 0.02),
+				HEADLIGHT, 4.0)
+		_light(parent, Vector3(0.40, 0.12, 0.04),
+			Vector3(side * 0.52, 0.80, 1.95), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.02, 0.07, 1.20),
+			Vector3(side * 0.835, 0.36, 0.0), trim)
+	_box(parent, Vector3(1.20, 0.03, 0.22), Vector3(0.0, 1.36, 1.84), paint,
+		Vector3(0.12, 0.0, 0.0))
+
+
+## R5 Turbo: rectangular headlights in a black panel across the nose,
+## the big black intakes in the rear flanks, black bumpers, upright tail
+## lights at the corners of the hatch.
+static func _r5_details(parent: Node3D, trim: Material) -> void:
+	var z := -1.78
+	_box(parent, Vector3(1.40, 0.15, 0.04), Vector3(0.0, 0.64, z), trim)
+	_box(parent, Vector3(1.58, 0.18, 0.12), Vector3(0.0, 0.38, z + 0.03),
+		trim)
+	_box(parent, Vector3(1.70, 0.18, 0.12), Vector3(0.0, 0.40, 1.90), trim)
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.26, 0.12, 0.04),
+			Vector3(side * 0.50, 0.64, z - 0.01), HEADLIGHT, 4.0)
+		_light(parent, Vector3(0.10, 0.22, 0.04),
+			Vector3(side * 0.74, 0.74, 1.92), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.04, 0.26, 0.42),
+			Vector3(side * 0.875, 0.68, 0.48), trim)
+
+
+## Focus RS: the swept headlights, black mesh grille and the wide intake
+## below, the roof spoiler over the tailgate and the tall tail lights in
+## the rear pillars.
+static func _focus_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	var z := -2.18
+	_box(parent, Vector3(0.60, 0.10, 0.04), Vector3(0.0, 0.58, z), trim)
+	_box(parent, Vector3(1.30, 0.18, 0.04), Vector3(0.0, 0.36, z), trim)
+	_box(parent, Vector3(1.40, 0.04, 0.24), Vector3(0.0, 1.42, 1.70), paint,
+		Vector3(0.10, 0.0, 0.0))
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.36, 0.11, 0.04),
+			Vector3(side * 0.58, 0.60, z + 0.04), HEADLIGHT, 4.0,
+			Vector3(0.0, side * 0.35, 0.0))
+		_light(parent, Vector3(0.08, 0.36, 0.04),
+			Vector3(side * 0.64, 1.10, 1.95), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.02, 0.07, 1.40),
+			Vector3(side * 0.875, 0.32, 0.0), trim)
+	_box(parent, Vector3(1.60, 0.14, 0.08), Vector3(0.0, 0.40, 2.00), trim)
+
+
+## M Coupé: a slim black intake in place of a grille, wide flat
+## headlights, the four tail pipes in the black lower rear and the tail
+## lights wrapping round the corners.
+static func _mcoupe_details(parent: Node3D, trim: Material) -> void:
+	var z := -2.04
+	_box(parent, Vector3(0.50, 0.08, 0.04), Vector3(0.0, 0.56, z), trim)
+	_box(parent, Vector3(1.30, 0.14, 0.04), Vector3(0.0, 0.34, z), trim)
+	_box(parent, Vector3(1.50, 0.18, 0.06), Vector3(0.0, 0.34, 2.00), trim)
+	for side in [-1.0, 1.0]:
+		_light(parent, Vector3(0.34, 0.09, 0.04),
+			Vector3(side * 0.52, 0.58, z + 0.02), HEADLIGHT, 4.0,
+			Vector3(0.0, side * 0.25, 0.0))
+		_light(parent, Vector3(0.30, 0.10, 0.04),
+			Vector3(side * 0.62, 0.78, 2.01), TAIL_LIGHT, 1.5)
+		for x in [0.08, 0.20]:
+			_pipe(parent, 0.04, Vector3(side * x, 0.30, 2.04))
+
+
+## SL: a wide black grille without a badge, twin headlights per side,
+## the two power domes on the bonnet, vents in the front wings, four
+## tail pipes and wide tail lights.
+static func _sl_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	var z := -2.24
+	_box(parent, Vector3(0.80, 0.18, 0.04), Vector3(0.0, 0.52, z), trim)
+	_box(parent, Vector3(1.40, 0.12, 0.04), Vector3(0.0, 0.32, z + 0.02),
+		trim)
+	_box(parent, Vector3(1.60, 0.16, 0.06), Vector3(0.0, 0.34, 2.33), trim)
+	for side in [-1.0, 1.0]:
+		_box(parent, Vector3(0.18, 0.04, 0.90), Vector3(side * 0.30, 0.78,
+			-1.30), paint, Vector3(0.06, 0.0, 0.0))
+		for x in [0.52, 0.70]:
+			_lamp(parent, 0.065, Vector3(side * x, 0.60, z + 0.10),
+				HEADLIGHT, 4.0)
+		_box(parent, Vector3(0.03, 0.10, 0.24),
+			Vector3(side * 0.90, 0.62, -1.00), trim)
+		_light(parent, Vector3(0.40, 0.11, 0.04),
+			Vector3(side * 0.58, 0.82, 2.31), TAIL_LIGHT, 1.5)
+		for x in [0.42, 0.54]:
+			_pipe(parent, 0.045, Vector3(side * x, 0.28, 2.36))
+
+
+## Formula car: front wing with end plates under the nose, the cockpit
+## opening with the helmet in it, wishbones out to the wheels, the rear
+## wing on its end plates, the diffuser and the rain light.
+static func _f1_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	_box(parent, Vector3(1.70, 0.03, 0.40), Vector3(0.0, 0.10, -2.40), trim)
+	_box(parent, Vector3(1.50, 0.025, 0.18), Vector3(0.0, 0.16, -2.30),
+		paint, Vector3(-0.25, 0.0, 0.0))
+	_box(parent, Vector3(0.42, 0.03, 0.62), Vector3(0.0, 0.655, -0.55), trim)
+	var helmet := StandardMaterial3D.new()
+	helmet.albedo_color = Color(0.95, 0.8, 0.1)
+	helmet.roughness = 0.3
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.13
+	sphere.height = 0.26
+	sphere.material = helmet
+	_add(parent, sphere, Vector3(0.0, 0.80, -0.42))
+	for side in [-1.0, 1.0]:
+		_box(parent, Vector3(0.02, 0.22, 0.46),
+			Vector3(side * 0.85, 0.18, -2.40), paint)
+		_box(parent, Vector3(0.02, 0.48, 0.60),
+			Vector3(side * 0.46, 0.80, 2.10), paint)
+		for y in [0.26, 0.40]:
+			_box(parent, Vector3(0.50, 0.02, 0.06),
+				Vector3(side * 0.48, y, -1.55), trim)
+			_box(parent, Vector3(0.48, 0.02, 0.06),
+				Vector3(side * 0.47, y, 1.55), trim)
+	_box(parent, Vector3(0.90, 0.025, 0.30), Vector3(0.0, 0.88, 2.15), trim,
+		Vector3(-0.10, 0.0, 0.0))
+	_box(parent, Vector3(0.90, 0.025, 0.20), Vector3(0.0, 1.00, 2.05), trim,
+		Vector3(-0.35, 0.0, 0.0))
+	_box(parent, Vector3(0.90, 0.16, 0.36), Vector3(0.0, 0.14, 1.95), trim)
+	_light(parent, Vector3(0.08, 0.10, 0.03), Vector3(0.0, 0.30, 2.08),
+		TAIL_LIGHT, 3.0)
+
+
+## Käfer 1303 S: round headlights on top of the front wings, chrome
+## bumper blades, the running boards between the wings, the louvres in
+## the engine lid and the big round tail lights on the rear wings.
+static func _kaefer_details(parent: Node3D, trim: Material) -> void:
+	var chrome := _chrome()
+	_box(parent, Vector3(1.60, 0.07, 0.07), Vector3(0.0, 0.38, -2.06),
+		chrome)
+	_box(parent, Vector3(1.60, 0.07, 0.07), Vector3(0.0, 0.42, 2.10),
+		chrome)
+	for k in 4:
+		_box(parent, Vector3(0.36, 0.015, 0.03),
+			Vector3(0.0, 0.88 - k * 0.04, 1.72 + k * 0.05), trim,
+			Vector3(0.9, 0.0, 0.0))
+	for side in [-1.0, 1.0]:
+		_lamp(parent, 0.09, Vector3(side * 0.56, 0.80, -1.72), HEADLIGHT,
+			4.0, Vector3(0.0, 0.0, 0.0), 0.12)
+		_lamp(parent, 0.07, Vector3(side * 0.60, 0.80, 1.86), TAIL_LIGHT,
+			1.5, Vector3(PI, 0.0, 0.0), 0.06)
+		_box(parent, Vector3(0.10, 0.03, 1.00),
+			Vector3(side * 0.74, 0.30, 0.0), trim)
+
+
+## Trabant: round headlights at the corners of the flat nose with the
+## slim grille between them, thin chrome bumpers, small tail lights.
+static func _trabant_details(parent: Node3D, trim: Material) -> void:
+	var chrome := _chrome()
+	var z := -1.74
+	_box(parent, Vector3(0.62, 0.08, 0.03), Vector3(0.0, 0.62, z), trim)
+	_box(parent, Vector3(1.40, 0.05, 0.06), Vector3(0.0, 0.36, z - 0.02),
+		chrome)
+	_box(parent, Vector3(1.40, 0.05, 0.06), Vector3(0.0, 0.40, 1.84),
+		chrome)
+	for side in [-1.0, 1.0]:
+		_lamp(parent, 0.075, Vector3(side * 0.52, 0.64, z - 0.01),
+			HEADLIGHT, 4.0)
+		_light(parent, Vector3(0.12, 0.10, 0.04),
+			Vector3(side * 0.56, 0.76, 1.83), TAIL_LIGHT, 1.5)
+
+
+## Unimog: the black grille and bumper on the nose, round headlights,
+## black mud guards over the wheels, the drop sides and tailgate of the
+## flatbed and the exhaust stack behind the cab.
+static func _unimog_details(parent: Node3D, paint: Material,
+		trim: Material) -> void:
+	_box(parent, Vector3(1.40, 0.30, 0.04), Vector3(0.0, 1.36, -2.64), trim)
+	_box(parent, Vector3(2.10, 0.25, 0.25), Vector3(0.0, 0.82, -2.70), trim)
+	_box(parent, Vector3(2.26, 0.50, 0.04), Vector3(0.0, 1.75, -0.86),
+		paint)
+	_box(parent, Vector3(2.26, 0.42, 0.04), Vector3(0.0, 1.71, 2.63), paint)
+	_box(parent, Vector3(0.10, 1.30, 0.10), Vector3(0.95, 2.35, -0.80),
+		trim)
+	for side in [-1.0, 1.0]:
+		_lamp(parent, 0.09, Vector3(side * 0.82, 1.36, -2.66), HEADLIGHT,
+			4.0)
+		_light(parent, Vector3(0.20, 0.12, 0.04),
+			Vector3(side * 0.90, 1.30, 2.66), TAIL_LIGHT, 1.5)
+		_box(parent, Vector3(0.04, 0.42, 3.45),
+			Vector3(side * 1.13, 1.71, 0.88), paint)
+		for axle in [-1.925, 1.925]:
+			_box(parent, Vector3(0.46, 0.04, 1.30),
+				Vector3(side * 0.96, 1.23, axle), trim)
+
+
+## A round lamp facing forward (rotation PI about x faces it back),
+## `depth` deep.
+static func _lamp(parent: Node3D, radius: float, at: Vector3, color: Color,
+		energy: float, rotation := Vector3.ZERO, depth := 0.04) -> void:
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.emission_enabled = true
+	mat.emission = color
+	mat.emission_energy_multiplier = energy
+	var disc := CylinderMesh.new()
+	disc.top_radius = radius
+	disc.bottom_radius = radius
+	disc.height = depth
+	disc.radial_segments = 16
+	disc.material = mat
+	_add(parent, disc, at).rotation = rotation + Vector3(PI / 2, 0.0, 0.0)
+
+
+## A tail pipe in chrome pointing back.
+static func _pipe(parent: Node3D, radius: float, at: Vector3) -> void:
+	var tube := CylinderMesh.new()
+	tube.top_radius = radius
+	tube.bottom_radius = radius
+	tube.height = 0.12
+	tube.radial_segments = 12
+	tube.material = _chrome()
+	_add(parent, tube, at).rotation = Vector3(PI / 2, 0.0, 0.0)
+
+
+static func _chrome() -> StandardMaterial3D:
+	var chrome := StandardMaterial3D.new()
+	chrome.albedo_color = Color(0.85, 0.86, 0.88)
+	chrome.metallic = 1.0
+	chrome.roughness = 0.2
+	return chrome
+
+
 ## The sections resampled every ARCH_STEP with round wheel openings: the
 ## sill follows a circle ARCH_GAP wider than the tyre around each axle
 ## (the wheel centre is `tyre` above the ground), and the half width
@@ -687,3 +1211,4 @@ static func _add(parent: Node3D, mesh: Mesh, at: Vector3) -> MeshInstance3D:
 	return node
 # - revised 2026-11-04 (Impreza, F40, 911 GT3 RS and Golf GTI bodies)
 # - revised 2026-11-06 (no brand marks: the four rings removed)
+# - revised 2026-11-06 (nine more bodies, canopy_paint, round lamps)

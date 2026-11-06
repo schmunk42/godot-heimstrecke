@@ -121,9 +121,9 @@ func setup(starts: Array, size_m: float, env: Environment,
 	car_title.text = "Choose a car"
 	car_title.add_theme_font_size_override("font_size", 30)
 	list.add_child(car_title)
-	# two columns, so eight cars take the height of four
+	# three columns, so seventeen cars take the height of six
 	var cars := GridContainer.new()
-	cars.columns = 2
+	cars.columns = 3
 	cars.add_theme_constant_override("h_separation", 6)
 	cars.add_theme_constant_override("v_separation", 6)
 	list.add_child(cars)
@@ -376,3 +376,4 @@ func _key_name(index: int) -> String:
 # - revised 2026-10-26 (route choice, free drive, route on the map)
 # - revised 2026-10-26 (hint for G)
 # - revised 2026-11-04 (cars in two columns)
+# - revised 2026-11-06 (three columns of cars)
