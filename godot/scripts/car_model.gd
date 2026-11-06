@@ -2,8 +2,8 @@
 extends RefCounted
 ## Procedural car bodies: lofted bodies with box wheel arches, a
 ## greenhouse (all dark glass, or in the paint with glass windows), trim,
-## lights and wheels with tyre and rim; the only brand mark is the four
-## rings on the Audis. Seven bodies (BODIES), chosen by the `body` key of
+## lights and wheels with tyre and rim; no brand marks (see
+## docs/licences.md#vehicles). Seven bodies (BODIES), chosen by the `body` key of
 ## a cars.gd entry: the 1980s Audi quattro (Typ 85) with its upright nose
 ## and sloping rear window down to the tail, the Sport quattro with the
 ## shorter wheelbase and the steeper windscreen, the Lamborghini
@@ -355,13 +355,12 @@ static func _quattro_details(parent: Node3D, trim: Material) -> void:
 			Vector3(side * 0.39, 0.71, z - 0.01), HEADLIGHT, 4.0)
 		_light(parent, Vector3(0.20, 0.12, 0.04),
 			Vector3(side * 0.58, 0.71, z - 0.01), HEADLIGHT, 4.0)
-	_rings(parent, Vector3(0.0, 0.71, z - 0.02))
 	_audi_front(parent, trim, z)
 	_audi_rear(parent, trim, 2.13, 1.40)
 
 
 ## Sport quattro after the 1:18 model: one large rectangular headlight
-## per side with the black grille and the rings between them, amber
+## per side with the black grille between them, amber
 ## indicators and a black grille band in the bumper, a black lip; at the
 ## back a black panel with two tail lights, a black bumper strip and the
 ## large black spoiler on the tail deck.
@@ -371,7 +370,6 @@ static func _sport_details(parent: Node3D, trim: Material) -> void:
 	for side in [-1.0, 1.0]:
 		_light(parent, Vector3(0.26, 0.12, 0.04),
 			Vector3(side * 0.60, 0.71, z - 0.01), HEADLIGHT, 4.0)
-	_rings(parent, Vector3(0.0, 0.71, z - 0.02))
 	_audi_front(parent, trim, z)
 	_audi_rear(parent, trim, 1.98, 1.50)
 
@@ -402,24 +400,6 @@ static func _audi_rear(parent: Node3D, trim: Material, z: float,
 		trim)
 	_box(parent, Vector3(width, 0.04, 0.22), Vector3(0.0, 1.03, z - 0.12),
 		trim, Vector3(0.08, 0.0, 0.0))
-
-
-## The four interlaced rings in chrome, centred at `at`, facing forward.
-static func _rings(parent: Node3D, at: Vector3) -> void:
-	var chrome := StandardMaterial3D.new()
-	chrome.albedo_color = Color(0.85, 0.86, 0.88)
-	chrome.metallic = 1.0
-	chrome.roughness = 0.2
-	var ring := TorusMesh.new()
-	ring.inner_radius = 0.036
-	ring.outer_radius = 0.046
-	ring.rings = 24
-	ring.ring_segments = 8
-	ring.material = chrome
-	for k in 4:
-		var x := (k - 1.5) * 0.068
-		_add(parent, ring, at + Vector3(x, 0.0, 0.0)).rotation = \
-			Vector3(PI / 2, 0.0, 0.0)
 
 
 ## Huracán STO: orange splitter and side skirts, black intakes, slim
@@ -706,3 +686,4 @@ static func _add(parent: Node3D, mesh: Mesh, at: Vector3) -> MeshInstance3D:
 	parent.add_child(node)
 	return node
 # - revised 2026-11-04 (Impreza, F40, 911 GT3 RS and Golf GTI bodies)
+# - revised 2026-11-06 (no brand marks: the four rings removed)

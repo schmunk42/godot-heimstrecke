@@ -4,7 +4,9 @@ extends RefCounted
 ## the Lamborghini Huracán STO, the Subaru Impreza WRX STI, the VW Golf
 ## II GTI 16V, the Ferrari F40 and the Porsche 911 GT3 RS. car.gd reads
 ## physics, drivetrain and engine from an entry, car_model.gd the body,
-## car_audio.gd the sound.
+## car_audio.gd the sound. The menu shows made-up names, not the makes
+## and models: those are trademarks, see docs/licences.md#vehicles. The
+## comments below name the real cars the data comes from.
 ##
 ## Keys of an entry:
 ##   name, body (car_model.gd BODIES), paint, rim colour
@@ -76,7 +78,7 @@ const FIVE_ORDERS := [[0.2, 0.3], [0.6, 0.25]]
 const QUATTRO_GEARS := [3.600, 2.125, 1.360, 0.971, 0.778]
 
 const CARS: Array[Dictionary] = [
-	{"name": "Audi quattro WR, 200 PS", "body": "quattro",
+	{"name": "Rally Coupé Turbo, 200 PS", "body": "quattro",
 	"paint": Color(0.66, 0.67, 0.69), "rim": Color(0.75, 0.76, 0.78),
 	# wheelbase 2.525 m, track about 1.42 m front and 1.46 m rear,
 	# 205/60 R 15
@@ -95,7 +97,7 @@ const CARS: Array[Dictionary] = [
 		[4500, 280], [5500, 255], [6500, 205]],
 	"boost_rpm": 2200.0, "lag_s": 0.6, "boost": 0.4,
 	"firing": 2.5, "orders": FIVE_ORDERS},
-	{"name": "Audi quattro 20V, 220 PS", "body": "quattro",
+	{"name": "Rally Coupé 20V, 220 PS", "body": "quattro",
 	"paint": Color(0.78, 0.05, 0.06), "rim": Color(0.55, 0.57, 0.6),
 	"wheels": QUATTRO_WHEELS, "rest": 0.40, "radius": 0.314,
 	"tyre_width": [0.215, 0.215],
@@ -110,7 +112,7 @@ const CARS: Array[Dictionary] = [
 		[5900, 262], [6900, 215]],
 	"boost_rpm": 2000.0, "lag_s": 0.5, "boost": 0.4,
 	"firing": 2.5, "orders": FIVE_ORDERS},
-	{"name": "Audi Sport quattro, 306 PS", "body": "sport_quattro",
+	{"name": "Rally Coupé Short, 306 PS", "body": "sport_quattro",
 	"paint": Color(0.93, 0.93, 0.91), "rim": Color(0.92, 0.92, 0.9),
 	# wheelbase 2.224 m (30 cm shorter; some sources give 2.204 m),
 	# 1.78 m wide, 235/45 VR 15
@@ -129,7 +131,7 @@ const CARS: Array[Dictionary] = [
 		[6700, 321], [7500, 270]],
 	"boost_rpm": 2800.0, "lag_s": 0.8, "boost": 0.5,
 	"firing": 2.5, "orders": FIVE_ORDERS},
-	{"name": "Lamborghini Huracán STO, 640 PS", "body": "sto",
+	{"name": "Wedge V10, 640 PS", "body": "sto",
 	"paint": Color(0.30, 0.66, 0.84), "rim": Color(0.06, 0.06, 0.07),
 	"wheels": [
 		Vector3(-0.84, -0.1, -1.31), Vector3(0.84, -0.1, -1.31),
@@ -148,7 +150,7 @@ const CARS: Array[Dictionary] = [
 	# even-firing V10: five pulses per crank turn, the bank beat at half
 	# the firing frequency and a rasp at one and a half
 	"firing": 5.0, "orders": [[0.5, 0.18], [1.5, 0.22]]},
-	{"name": "Subaru Impreza WRX STI, 265 PS", "body": "impreza",
+	{"name": "Boxer Saloon Turbo, 265 PS", "body": "impreza",
 	"paint": Color(0.08, 0.2, 0.55), "rim": Color(0.78, 0.62, 0.28),
 	# wheelbase 2.525 m, track 1.49 / 1.48 m, 225/45 R 17
 	"wheels": [
@@ -169,7 +171,7 @@ const CARS: Array[Dictionary] = [
 	# flat four with unequal-length headers: the rumble at the first and
 	# half crank order (1/2 and 1/4 of the firing frequency)
 	"firing": 2.0, "orders": [[0.5, 0.35], [0.25, 0.2]]},
-	{"name": "VW Golf II GTI 16V, 139 PS", "body": "golf",
+	{"name": "Hot Hatch 16V, 139 PS", "body": "golf",
 	"paint": Color(0.05, 0.05, 0.06), "rim": Color(0.6, 0.62, 0.65),
 	# wheelbase 2.475 m, track 1.427 / 1.422 m, 185/60 R 14
 	"wheels": [
@@ -188,7 +190,7 @@ const CARS: Array[Dictionary] = [
 		[6100, 160], [6800, 140]],
 	"boost_rpm": 0.0, "lag_s": 1.0, "boost": 0.0,
 	"firing": 2.0, "orders": [[0.5, 0.2], [1.5, 0.15]]},
-	{"name": "Ferrari F40, 478 PS", "body": "f40",
+	{"name": "Twin Turbo V8, 478 PS", "body": "f40",
 	"paint": Color(0.78, 0.04, 0.03), "rim": Color(0.55, 0.57, 0.6),
 	# wheelbase 2.45 m, track 1.594 / 1.606 m, 245/40 ZR 17 front and
 	# 335/35 ZR 17 rear (one radius for both)
@@ -210,7 +212,7 @@ const CARS: Array[Dictionary] = [
 	# flat-plane V8: four even pulses per crank turn, little burble, a
 	# rasp at one and a half
 	"firing": 4.0, "orders": [[0.5, 0.12], [1.5, 0.15]]},
-	{"name": "Porsche 911 GT3 RS, 525 PS", "body": "gt3rs",
+	{"name": "Flat Six Track, 525 PS", "body": "gt3rs",
 	"paint": Color(0.42, 0.74, 0.2), "rim": Color(0.22, 0.22, 0.24),
 	# wheelbase 2.457 m, track 1.63 / 1.582 m, 275/35 R 20 front and
 	# 335/30 R 21 rear (one radius for both)
@@ -233,3 +235,4 @@ const CARS: Array[Dictionary] = [
 	"firing": 3.0, "orders": [[0.5, 0.15], [1.5, 0.2]]},
 ]
 # - revised 2026-11-04 (Impreza, Golf GTI, F40 and 911 GT3 RS)
+# - revised 2026-11-06 (made-up names in the menu, no trademarks)
