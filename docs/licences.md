@@ -100,7 +100,7 @@ Decided on 2026-11-04. The clips in `godot/audio/codriver/` (one Ogg Vorbis file
 Decided on 2026-11-06. The cars are modelled on real ones (the 1980s Audi quattro and Sport quattro, Lamborghini Huracán STO, Subaru Impreza WRX STI, VW Golf II GTI 16V, Ferrari F40, Porsche 911 GT3 RS): proportions, power, torque, gears and weights come from data sheets and tests, the bodies are procedural lofts written in `car_model.gd`. Copyright and licences do not come into it, because nothing is taken over: no model, texture or sound. The risk lies in trademark and design law:
 
 - **Names and badges are trademarks.** Makers license their cars to games and enforce it; a free download is still public use. The menu therefore shows made-up names (Rally Coupé Turbo, Wedge V10, Hot Hatch 16V, ...) and the bodies carry no brand marks: the four Audi rings, the only badge there was, were removed for 0.1.1. Code comments and this documentation still name the real cars as the source of the data, which is descriptive use.
-- **Body shapes can be registered designs**, protected for at most 25 years from filing. Probably expired: quattro (1980), Golf II (1983), F40 (1987). Probably still protected: Impreza GD (from 2000), 911 type 992 (2019), Huracán STO (2021); Porsche also defends the 911 silhouette as a shape mark *(from memory, not verified)*. The procedural bodies are coarse, but meant to be recognised. Not changed so far; it is the remaining point for a legal review, and the way out would be to change the most distinctive features of the three newer bodies (lights, intakes, wing) or to drop them.
+- **Body shapes can be registered designs**, protected for at most 25 years from filing. Probably expired: quattro (1980), Golf II (1983), F40 (1987), and of the cars added in 0.2.0 the Renault 5 Turbo (1980), the Delta Integrale (1987 on the Delta of 1979), the Käfer 1303 (1972), the Trabant 601 (1964), the M Coupé (1998) and the Focus Mk1 (1998), the last two only just. Probably still protected: Impreza GD (from 2000), 911 type 992 (2019), Huracán STO (2021), SL R230 (2001, but the SL 63 wears the facelift of 2008, so about 2033) and Unimog U 5023 (2013). Shape marks last as long as they are renewed: Porsche defends the 911 silhouette and VW holds the Käfer shape as a three-dimensional mark *(both from memory, not verified)*. Unimog and the star are Daimler marks; the formula car carries no team colours, the livery of a team is its mark. The procedural bodies are coarse, but meant to be recognised. Not changed so far; it is the remaining point for a legal review, and the way out would be to change the most distinctive features of the three newer bodies (lights, intakes, wing) or to drop them.
 - **Facts are free**: power, torque, gear ratios, weights and 0-100 times are not protected.
 - **Made-up brands** on the junction boards (oil and tyres) must not resemble real ones.
 
@@ -113,7 +113,7 @@ Decided on 2026-11-06. The cars are modelled on real ones (the 1980s Audi quattr
 5. From which point is showing the game "public use": events, shared builds, external testers?
 6. Do the committed `route.json` files (OSRM output, OSM-derived) need more than the OSM credit?
 7. Which licence do the project's own code and content get, and does a build with an embedded world fall under the ODbL notice duty?
-8. Are the bodies of the three newer cars (Impreza GD, 911 type 992, Huracán STO) close enough to registered designs or a shape mark to need a change, see [Vehicles](#vehicles)?
+8. Are the bodies of the newer cars (Impreza GD, 911 type 992, Huracán STO, SL R230, Unimog U 5023) or the Käfer with its shape mark close enough to a registered design or mark to need a change, see [Vehicles](#vehicles)?
 
 ## Checklist for a new world
 
@@ -139,3 +139,4 @@ Decided on 2026-11-06. The cars are modelled on real ones (the 1980s Audi quattr
 <!-- - revised 2026-10-25 (decisions: ODbL world data, MIT code, credits corrected, credits screen) -->
 <!-- - revised 2026-10-27 (GEDTM30 for Cyprus) -->
 <!-- - revised 2026-11-06 (vehicles: trademarks and designs) -->
+<!-- - revised 2026-11-06 (vehicles of 0.2.0) -->
